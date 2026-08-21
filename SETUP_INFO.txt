@@ -1,0 +1,16 @@
+DOMLIGHT PERMANENT SETUP
+
+Permanent installer filename: Domlight_Setup.zip
+Baseline inside setup: v96 RELEASE
+SHA-256 (full setup package): 98dfa65b94400034562e2df3fbad47947c101cdbb181092ca92b5c2631905d6c
+
+Install on a new Windows PC:
+1. Download Domlight_Setup.zip.
+2. Extract the ZIP completely.
+3. Run INSTALL_DOMLIGHT_FINAL.bat.
+4. Use the Domlight desktop shortcut.
+5. Sign in to the resident portal again on the new PC.
+6. Authorize Gmail again when first needed.
+7. Future updates are installed from inside Domlight with the Update button via GitHub.
+
+IMPORTANT: never delete Documents\Domlight\data on an existing installation.
