@@ -1,22 +1,6 @@
 {
-  "version": "v95 RELEASE",
+  "version": "v96 RELEASE",
   "published": "2026-08-21",
-  "notes": "Fix updater handoff so the old Domlight window closes before the new version appears. User data is preserved.",
-  "files": [
-    {
-      "path": "UpdateFromGitHub.ps1",
-      "url": "https://raw.githubusercontent.com/antjustdevelops/Domlight-Releases/main/files/v95/UpdateFromGitHub.ps1",
-      "sha256": "6f3e8a2ecee7a28680801f05dc924aecfe8130f5cdf1fc002616a1fca06f3757"
-    },
-    {
-      "path": "DomlightLauncher.vbs",
-      "url": "https://raw.githubusercontent.com/antjustdevelops/Domlight-Releases/main/files/v95/DomlightLauncher.vbs",
-      "sha256": "a7e0831bd820f3bf47074d179ffd1832c7e4a0a0600e785bc143075167dcbf5e"
-    },
-    {
-      "path": "update_transition.flag",
-      "url": "https://raw.githubusercontent.com/antjustdevelops/Domlight-Releases/main/files/v95/update_transition.flag",
-      "sha256": "44fd8fcd0296d1be65d0ef5b3da4b9470d73ad5acbf4c14bc71c35287baa59cc"
-    }
-  ]
+  "notes": "Transition test from v95 using the new handoff already installed in v95. No functional changes; verifies that v95 closes before v96 opens. User data is preserved.",
+  "files": []
 }
