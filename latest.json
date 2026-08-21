@@ -1,0 +1,6 @@
+{
+  "version": "v94 RELEASE",
+  "published": "2026-08-21",
+  "notes": "GitHub automatic-update transport test. No functional Domlight changes; verifies version check, download path, safe data preservation and restart.",
+  "files": []
+}
