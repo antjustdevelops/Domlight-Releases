@@ -1,15 +1,10 @@
 {
-  "version": "v101 RECEIPT CHECK REPAIR",
+  "version": "v102 RECEIPT STATUS FIX",
   "published": "2026-08-24",
-  "notes": "Receipt-check repair. Keeps the existing AutoCheck engine and replaces the manual launcher so it waits for the real checker, propagates failures into last_check.json, and only signals completion after AutoCheck exits. No receipts or account data are deleted.",
+  "notes": "Repairs account list recovery and manual receipt-check status handling. Existing receipt history is preserved. No receipt or account data is deleted.",
   "files": [
-    {
-      "path": "RunAutoCheckHidden.ps1",
-      "url": "https://raw.githubusercontent.com/antjustdevelops/Domlight-Releases/main/files/v101/RunAutoCheckHidden.ps1"
-    },
-    {
-      "path": "VERSION.txt",
-      "url": "https://raw.githubusercontent.com/antjustdevelops/Domlight-Releases/main/files/v101/VERSION.txt"
-    }
+    {"path":"RunAutoCheckHidden.ps1","url":"https://raw.githubusercontent.com/antjustdevelops/Domlight-Releases/main/files/v102/RunAutoCheckHidden.ps1"},
+    {"path":"AccountStatus.ps1","url":"https://raw.githubusercontent.com/antjustdevelops/Domlight-Releases/main/files/v102/AccountStatus.ps1"},
+    {"path":"VERSION.txt","url":"https://raw.githubusercontent.com/antjustdevelops/Domlight-Releases/main/files/v102/VERSION.txt"}
   ]
 }
