@@ -1,15 +1,15 @@
 {
-  "version": "v99 RELEASE",
+  "version": "v100 DIAGNOSTIC",
   "published": "2026-08-24",
-  "notes": "v99 hotfix: restores the missing manual receipt-check launcher so the Check new receipts button actually runs AutoCheck. No receipt or account data is deleted.",
+  "notes": "Diagnostic-only release. Adds DiagnoseDomlight.ps1 to inspect the installed receipt-check chain without changing receipts, accounts or portal data.",
   "files": [
     {
-      "path": "RunAutoCheckHidden.ps1",
-      "url": "https://raw.githubusercontent.com/antjustdevelops/Domlight-Releases/main/files/v99/RunAutoCheckHidden.ps1"
+      "path": "DiagnoseDomlight.ps1",
+      "url": "https://raw.githubusercontent.com/antjustdevelops/Domlight-Releases/main/files/v100/DiagnoseDomlight.ps1"
     },
     {
       "path": "VERSION.txt",
-      "url": "https://raw.githubusercontent.com/antjustdevelops/Domlight-Releases/main/files/v99/VERSION.txt"
+      "url": "https://raw.githubusercontent.com/antjustdevelops/Domlight-Releases/main/files/v100/VERSION.txt"
     }
   ]
 }
