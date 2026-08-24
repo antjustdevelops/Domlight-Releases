@@ -1,6 +1,42 @@
 {
-  "version": "v96 RELEASE",
-  "published": "2026-08-21",
-  "notes": "Transition test from v95 using the new handoff already installed in v95. No functional changes; verifies that v95 closes before v96 opens. User data is preserved.",
-  "files": []
+  "version": "v97 RELEASE",
+  "published": "2026-08-24",
+  "notes": "v97: account lifecycle tracking, new-account archive classification, improved background auto-check behavior, scheduler resilience, and clearer status reporting. VPN-specific changes are not included in this release.",
+  "files": [
+    {
+      "path": "AccountStatus.ps1",
+      "url": "https://raw.githubusercontent.com/antjustdevelops/Domlight-Releases/main/files/v97/AccountStatus.ps1",
+      "sha256": "e922574a5ce214208d2a20c0bb6152fc1a75b31ade3b68f49d18d881520e2f07"
+    },
+    {
+      "path": "AutoCheck.ps1",
+      "url": "https://raw.githubusercontent.com/antjustdevelops/Domlight-Releases/main/files/v97/AutoCheck.ps1",
+      "sha256": "db84b782bbf05b28ce6ab7a379f40d45fc083ad2dfb076fb70ce9ee98f230e65"
+    },
+    {
+      "path": "ConfigureAutoCheckTask.ps1",
+      "url": "https://raw.githubusercontent.com/antjustdevelops/Domlight-Releases/main/files/v97/ConfigureAutoCheckTask.ps1",
+      "sha256": "bf660226b5837aeec55eb479a2128e6faa078ba73999c6b16aba3a704d223d61"
+    },
+    {
+      "path": "Domlight.ps1",
+      "url": "https://raw.githubusercontent.com/antjustdevelops/Domlight-Releases/main/files/v97/Domlight.ps1",
+      "sha256": "3d0936de663577ab392eb6ef0b804810e8a75b20bddfe77c6a3b36d0a29cab15"
+    },
+    {
+      "path": "ENABLE_AUTO_CHECK.bat",
+      "url": "https://raw.githubusercontent.com/antjustdevelops/Domlight-Releases/main/files/v97/ENABLE_AUTO_CHECK.bat",
+      "sha256": "3ceab12bed426f07080764690a6112c41f3e615493401383d6e0e46de45ff149"
+    },
+    {
+      "path": "MENU_DOMLIGHT.ps1",
+      "url": "https://raw.githubusercontent.com/antjustdevelops/Domlight-Releases/main/files/v97/MENU_DOMLIGHT.ps1",
+      "sha256": "97b957b12e0ace132d8d4fef94576da855cc1fc6b41e48c9a4eb3b5f999a4fd9"
+    },
+    {
+      "path": "VERSION.txt",
+      "url": "https://raw.githubusercontent.com/antjustdevelops/Domlight-Releases/main/files/v97/VERSION.txt",
+      "sha256": "f0c2c51dfaaf27a0b3869598597e827e759f0a5ae82874ecc916aa7150a40703"
+    }
+  ]
 }
