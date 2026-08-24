@@ -1,15 +1,15 @@
 {
-  "version": "v98 RELEASE",
+  "version": "v99 RELEASE",
   "published": "2026-08-24",
-  "notes": "v98 hotfix: fixes the Account Status window failing to open on Windows PowerShell because of text encoding corruption. No receipt data or account data is changed.",
+  "notes": "v99 hotfix: restores the missing manual receipt-check launcher so the Check new receipts button actually runs AutoCheck. No receipt or account data is deleted.",
   "files": [
     {
-      "path": "AccountStatus.ps1",
-      "url": "https://raw.githubusercontent.com/antjustdevelops/Domlight-Releases/main/files/v98/AccountStatus.ps1"
+      "path": "RunAutoCheckHidden.ps1",
+      "url": "https://raw.githubusercontent.com/antjustdevelops/Domlight-Releases/main/files/v99/RunAutoCheckHidden.ps1"
     },
     {
       "path": "VERSION.txt",
-      "url": "https://raw.githubusercontent.com/antjustdevelops/Domlight-Releases/main/files/v98/VERSION.txt"
+      "url": "https://raw.githubusercontent.com/antjustdevelops/Domlight-Releases/main/files/v99/VERSION.txt"
     }
   ]
 }
