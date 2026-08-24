@@ -1,15 +1,15 @@
 {
-  "version": "v100 DIAGNOSTIC",
+  "version": "v101 RECEIPT CHECK REPAIR",
   "published": "2026-08-24",
-  "notes": "Diagnostic-only release. Adds DiagnoseDomlight.ps1 to inspect the installed receipt-check chain without changing receipts, accounts or portal data.",
+  "notes": "Receipt-check repair. Keeps the existing AutoCheck engine and replaces the manual launcher so it waits for the real checker, propagates failures into last_check.json, and only signals completion after AutoCheck exits. No receipts or account data are deleted.",
   "files": [
     {
-      "path": "DiagnoseDomlight.ps1",
-      "url": "https://raw.githubusercontent.com/antjustdevelops/Domlight-Releases/main/files/v100/DiagnoseDomlight.ps1"
+      "path": "RunAutoCheckHidden.ps1",
+      "url": "https://raw.githubusercontent.com/antjustdevelops/Domlight-Releases/main/files/v101/RunAutoCheckHidden.ps1"
     },
     {
       "path": "VERSION.txt",
-      "url": "https://raw.githubusercontent.com/antjustdevelops/Domlight-Releases/main/files/v100/VERSION.txt"
+      "url": "https://raw.githubusercontent.com/antjustdevelops/Domlight-Releases/main/files/v101/VERSION.txt"
     }
   ]
 }
