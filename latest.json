@@ -1,10 +1,15 @@
 {
-  "version": "v102 RECEIPT STATUS FIX",
+  "version": "v103 STABLE ROLLBACK",
   "published": "2026-08-24",
-  "notes": "Repairs account list recovery and manual receipt-check status handling. Existing receipt history is preserved. No receipt or account data is deleted.",
+  "notes": "Rollback package. Restores the stable pre-v97 Domlight program files from the full setup package. The data folder, receipt archive, session and local user data are preserved. Current program files are backed up before restore.",
   "files": [
-    {"path":"RunAutoCheckHidden.ps1","url":"https://raw.githubusercontent.com/antjustdevelops/Domlight-Releases/main/files/v102/RunAutoCheckHidden.ps1"},
-    {"path":"AccountStatus.ps1","url":"https://raw.githubusercontent.com/antjustdevelops/Domlight-Releases/main/files/v102/AccountStatus.ps1"},
-    {"path":"VERSION.txt","url":"https://raw.githubusercontent.com/antjustdevelops/Domlight-Releases/main/files/v102/VERSION.txt"}
+    {
+      "path": "RestoreStable.ps1",
+      "url": "https://raw.githubusercontent.com/antjustdevelops/Domlight-Releases/main/files/v103/RestoreStable.ps1"
+    },
+    {
+      "path": "MENU_DOMLIGHT.ps1",
+      "url": "https://raw.githubusercontent.com/antjustdevelops/Domlight-Releases/main/files/v103/MENU_DOMLIGHT.ps1"
+    }
   ]
 }
