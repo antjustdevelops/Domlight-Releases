@@ -1,0 +1,33 @@
+Domlight v105 - AutoCheck account lifecycle integration
+
+Baseline
+- Start from the verified pre-v97 AutoCheck logic, not the later v97 AutoCheck as a whole.
+- Keep existing receipt identity detection, download, sorting, session and proxy behavior unchanged.
+- Add AccountState.ps1 as an isolated lifecycle module.
+
+Integration point
+1. Portal authentication succeeds.
+2. Parse-Accounts returns a non-empty account list.
+3. Only then merge the successful portal snapshot into accounts_state.json.
+4. MissingThreshold = 3 successful portal account-list reads.
+5. Current receipt check loop still iterates only accounts actually returned by the portal.
+6. ManuallyDisabled accounts are skipped without deleting their local state/history.
+
+Safety invariants
+- A failed portal request must never increment MissingSuccessCount.
+- A zero-account parse is an error and must never mark all known accounts missing.
+- No receipt PDF or receipt folder is deleted when account state changes.
+- Existing receipt download identity logic is unchanged.
+- Existing receipt organizer invocation is unchanged.
+- Existing session.dat and connection.json formats are unchanged.
+- latest.json/main are not changed during dev testing.
+
+Offline tests
+- Test-AccountState.ps1: lifecycle and JSON persistence.
+- Test-AutoCheckAccountIntegration.ps1: current portal check set versus retained local state.
+
+Next gate before stable release
+- Build a complete v105 test package from the verified v96 baseline plus AccountState.ps1.
+- Run on a separate Domlight_TEST folder using a copy of local data/session, never the working Domlight folder.
+- Verify real portal read returns 8 accounts and downloads/sorting remain unchanged.
+- Only after that can v105 be considered for stable main/latest.json.
