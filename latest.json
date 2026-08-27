@@ -1,8 +1,16 @@
 {
-  "version": "v109 RELEASE",
+  "version": "v110 RELEASE",
   "published": "2026-08-27",
-  "notes": "Consolidates account-status address handling into one canonical flow. Repairs missing address metadata from the local receipt archive, scans all available PDFs until a full address is found, preserves account lifecycle/exclusion rules, local data and receipts.",
+  "notes": "Adds single-instance behavior for Domlight child windows and closes the active child window with Escape while keeping the main dashboard open. Includes the verified v109 full-address recovery flow and preserves local data, receipts, account lifecycle and exclusion rules.",
   "files": [
+    {
+      "path": "MENU_DOMLIGHT.ps1",
+      "url": "https://raw.githubusercontent.com/antjustdevelops/Domlight-Releases/main/files/v110/MENU_DOMLIGHT.ps1"
+    },
+    {
+      "path": "SingleWindowLauncher.ps1",
+      "url": "https://raw.githubusercontent.com/antjustdevelops/Domlight-Releases/main/files/v110/SingleWindowLauncher.ps1"
+    },
     {
       "path": "AccountStatus.ps1",
       "url": "https://raw.githubusercontent.com/antjustdevelops/Domlight-Releases/main/files/v109/AccountStatus.ps1"
