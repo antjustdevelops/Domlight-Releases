@@ -1,7 +1,7 @@
 {
-  "version": "v112 RELEASE",
+  "version": "v113 RELEASE",
   "published": "2026-08-27",
-  "notes": "Adds a read-only MeterDiscovery diagnostic tool. It uses the saved Domlight session to find meter and reading pages without sending data. Local data, receipts and settings are preserved.",
+  "notes": "Fixes MeterDiscovery on Windows PowerShell 5.1 by loading System.Security before decrypting the saved Domlight session. Read-only diagnostic only; local data, receipts and settings are preserved.",
   "files": [
     {
       "path": "MeterDiscovery.ps1",
