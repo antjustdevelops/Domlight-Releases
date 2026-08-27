@@ -9,139 +9,118 @@ $DomlightFile = Join-Path $Root 'Domlight.ps1'
 $DataDir = Join-Path $Root 'data'
 $OutFile = Join-Path $DataDir 'meter_discovery_report.txt'
 
-function Absolute-Url([string]$Href,[string]$From){
-    try { return ([Uri]::new([Uri]$From,$Href)).AbsoluteUri } catch { return '' }
-}
-function Is-SameHost([string]$Url,[string]$BaseUrl){
-    try { return ([Uri]$Url).Host -eq ([Uri]$BaseUrl).Host } catch { return $false }
-}
-function Is-InterestingText([string]$Text){
-    if([string]::IsNullOrWhiteSpace($Text)){ return $false }
-    return $Text -match '(?i)сч[её]тчик|показан|прибор\s+уч[её]т|meter|reading|counter|device'
-}
+function Absolute-Url([string]$Href,[string]$From){ try { return ([Uri]::new([Uri]$From,$Href)).AbsoluteUri } catch { return '' } }
+function Clean-Text([string]$Html){ if($null -eq $Html){return ''}; return (([Net.WebUtility]::HtmlDecode(($Html -replace '(?is)<script.*?</script>',' ' -replace '(?is)<style.*?</style>',' ' -replace '<[^>]+>',' ')) -replace '\s+',' ').Trim()) }
 function Redact([string]$Text){
     if($null -eq $Text){ return '' }
-    $x = $Text
-    $x = [regex]::Replace($x,'(?i)(csrf|token|authorization|cookie)(\s*[=:]\s*)[^\s&;"'']+','$1$2[REDACTED]')
-    $x = [regex]::Replace($x,'\b\d{10,16}\b','[NUMBER]')
+    $x=$Text
+    $x=[regex]::Replace($x,'(?i)(csrf|token|authorization|cookie)(\s*[=:]\s*)[^\s&;"'']+','$1$2[REDACTED]')
+    $x=[regex]::Replace($x,'\b\d{10,16}\b','[NUMBER]')
     return $x
+}
+function Attr([string]$Attrs,[string]$Name){
+    $m=[regex]::Match($Attrs,'(?is)(?:^|\s)'+[regex]::Escape($Name)+'\s*=\s*["'']([^"'']*)["'']')
+    if($m.Success){ return [Net.WebUtility]::HtmlDecode($m.Groups[1].Value) }
+    $m=[regex]::Match($Attrs,'(?is)(?:^|\s)'+[regex]::Escape($Name)+'\s*=\s*([^\s>]+)')
+    if($m.Success){ return [Net.WebUtility]::HtmlDecode($m.Groups[1].Value) }
+    return ''
+}
+function Describe-Form([string]$Block,[string]$PageUrl){
+    $open=[regex]::Match($Block,'(?is)<form\b(?<attrs>[^>]*)>')
+    $attrs=$open.Groups['attrs'].Value
+    $method=(Attr $attrs 'method'); if([string]::IsNullOrWhiteSpace($method)){$method='GET'}; $method=$method.ToUpperInvariant()
+    $action=(Attr $attrs 'action'); if([string]::IsNullOrWhiteSpace($action)){$action=$PageUrl}else{$action=Absolute-Url $action $PageUrl}
+    $items=@()
+    foreach($m in [regex]::Matches($Block,'(?is)<input\b(?<attrs>[^>]*)>')){
+        $a=$m.Groups['attrs'].Value; $name=Attr $a 'name'; $type=Attr $a 'type'; if([string]::IsNullOrWhiteSpace($type)){$type='text'}
+        $value=Attr $a 'value'; $placeholder=Attr $a 'placeholder'
+        if($name -match '(?i)csrf|token'){ $value='[REDACTED]' }
+        $items += ('input name="'+$name+'" type="'+$type+'" value="'+(Redact $value)+'" placeholder="'+(Redact $placeholder)+'"')
+    }
+    foreach($m in [regex]::Matches($Block,'(?is)<select\b(?<attrs>[^>]*)>(?<body>.*?)</select>')){
+        $name=Attr $m.Groups['attrs'].Value 'name'; $items += ('select name="'+$name+'"')
+    }
+    foreach($m in [regex]::Matches($Block,'(?is)<textarea\b(?<attrs>[^>]*)>(?<body>.*?)</textarea>')){
+        $name=Attr $m.Groups['attrs'].Value 'name'; $items += ('textarea name="'+$name+'"')
+    }
+    [pscustomobject]@{Method=$method;Action=$action;Fields=$items;Text=(Clean-Text $Block)}
 }
 
 try {
-    if(-not(Test-Path -LiteralPath $DomlightFile)){
-        throw "Domlight.ps1 не найден: $DomlightFile"
-    }
+    if(-not(Test-Path -LiteralPath $DomlightFile)){ throw "Domlight.ps1 не найден: $DomlightFile" }
 
     [Windows.Forms.MessageBox]::Show(
-        "Сейчас откроется обычное окно Domlight.`r`n`r`nУбедитесь, что статус 'Подключено'. Если потребуется - войдите по SMS.`r`nПосле этого ЗАКРОЙТЕ только это окно Domlight.`r`n`r`nДиагностика продолжится автоматически в той же интернет-сессии. Ничего на портал отправляться не будет.",
-        'Domlight - диагностика счётчиков',
-        'OK',
-        'Information'
+        "Сейчас откроется обычное окно Domlight.`r`n`r`nУбедитесь, что статус 'Подключено'. Затем ЗАКРОЙТЕ только это окно Domlight.`r`n`r`nПосле закрытия диагностика прочитает страницу счётчиков в той же живой сессии. Ничего отправляться не будет.",
+        'Domlight - диагностика счётчиков','OK','Information'
     ) | Out-Null
 
-    # Dot-source the real Domlight client so its authenticated WebSession remains
-    # in this exact PowerShell process after the window is closed.
     . $DomlightFile
 
-    if($null -eq $script:WebSession){
-        throw 'Не удалось получить живую WebSession из Domlight.'
+    if($null -eq $script:WebSession){ throw 'Не удалось получить живую WebSession из Domlight.' }
+    $verify=Invoke-DomlightGet $ReceiptsUrl
+    if(-not(Is-Authenticated([string]$verify.Content))){ throw "Сессия не авторизована. Запустите диагностику снова и перед закрытием окна убедитесь, что статус 'Подключено'." }
+
+    $MeterUrl="$BaseUrl/meter/index"
+    $r=Invoke-DomlightGet $MeterUrl
+    $html=[string]$r.Content
+    if(-not(Is-Authenticated $html)){ throw 'Страница счётчиков открылась без авторизации.' }
+
+    $title=''; $tm=[regex]::Match($html,'(?is)<title[^>]*>(.*?)</title>'); if($tm.Success){$title=Clean-Text $tm.Groups[1].Value}
+    $pageText=Clean-Text $html
+
+    $forms=@()
+    foreach($fm in [regex]::Matches($html,'(?is)<form\b[^>]*>.*?</form>')){ $forms += Describe-Form $fm.Value $MeterUrl }
+
+    $links=@()
+    foreach($m in [regex]::Matches($html,'(?is)<a\b(?<attrs>[^>]*)>(?<body>.*?)</a>')){
+        $href=Attr $m.Groups['attrs'].Value 'href'; if([string]::IsNullOrWhiteSpace($href)){continue}
+        $abs=Absolute-Url $href $MeterUrl; $text=Clean-Text $m.Groups['body'].Value
+        if($abs -match '(?i)/meter/|reading|counter|device|value'){ $links += [pscustomobject]@{Text=$text;Url=$abs} }
     }
-    if([string]::IsNullOrWhiteSpace([string]$BaseUrl)){
-        throw 'Domlight не передал BaseUrl.'
+
+    $inputs=@()
+    foreach($m in [regex]::Matches($html,'(?is)<input\b(?<attrs>[^>]*)>')){
+        $a=$m.Groups['attrs'].Value
+        $name=Attr $a 'name'; $id=Attr $a 'id'; $type=Attr $a 'type'; if([string]::IsNullOrWhiteSpace($type)){$type='text'}
+        $value=Attr $a 'value'; if($name -match '(?i)csrf|token'){$value='[REDACTED]'}
+        $inputs += [pscustomobject]@{Name=$name;Id=$id;Type=$type;Value=(Redact $value);Placeholder=(Redact (Attr $a 'placeholder'));Min=(Attr $a 'min');Max=(Attr $a 'max');Step=(Attr $a 'step')}
     }
 
-    $verify = Invoke-DomlightGet $ReceiptsUrl
-    if(-not (Is-Authenticated ([string]$verify.Content))){
-        throw "После закрытия окна Domlight сессия не авторизована. Запустите диагностику снова и перед закрытием окна убедитесь, что статус 'Подключено'."
-    }
-
-    $queue = New-Object Collections.Generic.Queue[string]
-    $seen = @{}
-    $pages = @()
-    $hits = @()
-    $maxPages = 40
-    $queue.Enqueue($ReceiptsUrl)
-
-    while($queue.Count -gt 0 -and $pages.Count -lt $maxPages){
-        $url = $queue.Dequeue()
-        if($seen.ContainsKey($url)){ continue }
-        $seen[$url] = $true
-
-        try { $r = Invoke-DomlightGet $url } catch { continue }
-        $html = [string]$r.Content
-
-        $title=''
-        $tm=[regex]::Match($html,'(?is)<title[^>]*>(.*?)</title>')
-        if($tm.Success){
-            $title=([Net.WebUtility]::HtmlDecode(($tm.Groups[1].Value -replace '<[^>]+>',' ')) -replace '\s+',' ').Trim()
-        }
-        $pages += [pscustomobject]@{Url=$url;Title=$title;Status=[int]$r.StatusCode}
-
-        foreach($m in [regex]::Matches($html,'(?is)<a\b[^>]*href=["''](?<href>[^"'']+)["''][^>]*>(?<text>.*?)</a>')){
-            $href=[Net.WebUtility]::HtmlDecode($m.Groups['href'].Value)
-            $text=([Net.WebUtility]::HtmlDecode(($m.Groups['text'].Value -replace '<[^>]+>',' ')) -replace '\s+',' ').Trim()
-            $abs=Absolute-Url $href $url
-            if([string]::IsNullOrWhiteSpace($abs) -or -not(Is-SameHost $abs $BaseUrl)){ continue }
-
-            if(Is-InterestingText ($text+' '+$abs)){
-                $hits += [pscustomobject]@{Type='LINK';Page=$url;Text=$text;Target=$abs}
-            }
-
-            if($abs -notmatch '(?i)/logout|/auth/|/file/get|\.(pdf|jpg|jpeg|png|gif|svg|css|js)(\?|$)' -and -not $seen.ContainsKey($abs)){
-                $queue.Enqueue($abs)
-            }
-        }
-
-        foreach($m in [regex]::Matches($html,'(?is)<form\b(?<attrs>[^>]*)>(?<body>.*?)</form>')){
-            $block=$m.Value
-            $action=''
-            $am=[regex]::Match($m.Groups['attrs'].Value,'(?i)action=["'']([^"'']*)["'']')
-            if($am.Success){ $action=Absolute-Url ([Net.WebUtility]::HtmlDecode($am.Groups[1].Value)) $url }
-
-            $method='GET'
-            $mm=[regex]::Match($m.Groups['attrs'].Value,'(?i)method=["'']([^"'']+)["'']')
-            if($mm.Success){ $method=$mm.Groups[1].Value.ToUpperInvariant() }
-
-            $plain=([Net.WebUtility]::HtmlDecode(($block -replace '<[^>]+>',' ')) -replace '\s+',' ').Trim()
-            $names=@([regex]::Matches($block,'(?i)name=["'']([^"'']+)["'']') | ForEach-Object {$_.Groups[1].Value} | Select-Object -Unique)
-
-            if(Is-InterestingText ($plain+' '+$action+' '+($names -join ' '))){
-                $hits += [pscustomobject]@{Type='FORM';Page=$url;Text=('method='+$method+' fields='+($names -join ','));Target=$action}
-            }
+    $lines=New-Object Collections.Generic.List[string]
+    $lines.Add('DOMLIGHT METER STRUCTURE DISCOVERY - LIVE SESSION - READ ONLY')
+    $lines.Add('Generated: '+(Get-Date -Format 'yyyy-MM-dd HH:mm:ss'))
+    $lines.Add('Authenticated session: YES')
+    $lines.Add('HTTP: '+[int]$r.StatusCode)
+    $lines.Add('URL: '+$MeterUrl)
+    $lines.Add('Title: '+(Redact $title))
+    $lines.Add('No POST/PUT/PATCH/DELETE requests were sent by this discovery stage.')
+    $lines.Add('')
+    $lines.Add('VISIBLE PAGE TEXT:')
+    $lines.Add('  '+(Redact $pageText))
+    $lines.Add('')
+    $lines.Add('METER-RELATED LINKS:')
+    if($links.Count -eq 0){$lines.Add('  NONE')}else{foreach($x in $links|Sort-Object Url,Text -Unique){$lines.Add('  '+(Redact $x.Text)+' -> '+(Redact $x.Url))}}
+    $lines.Add('')
+    $lines.Add('ALL INPUTS ON /meter/index:')
+    if($inputs.Count -eq 0){$lines.Add('  NONE')}else{foreach($x in $inputs){$lines.Add(('  name={0} | id={1} | type={2} | value={3} | placeholder={4} | min={5} | max={6} | step={7}' -f $x.Name,$x.Id,$x.Type,$x.Value,$x.Placeholder,$x.Min,$x.Max,$x.Step))}}
+    $lines.Add('')
+    $lines.Add('FORMS ON /meter/index:')
+    if($forms.Count -eq 0){$lines.Add('  NONE')}else{
+        $i=0
+        foreach($f in $forms){
+            $i++
+            $lines.Add(('  FORM #{0}: method={1} action={2}' -f $i,$f.Method,(Redact $f.Action)))
+            $lines.Add('    text: '+(Redact $f.Text))
+            foreach($field in $f.Fields){$lines.Add('    '+(Redact $field))}
         }
     }
 
     New-Item -ItemType Directory -Force -Path $DataDir | Out-Null
-    $lines = New-Object Collections.Generic.List[string]
-    $lines.Add('DOMLIGHT METER DISCOVERY - LIVE SESSION - READ ONLY')
-    $lines.Add('Generated: '+(Get-Date -Format 'yyyy-MM-dd HH:mm:ss'))
-    $lines.Add('Authenticated session: YES')
-    $lines.Add('No POST/PUT/PATCH/DELETE requests were sent by the discovery stage.')
-    $lines.Add('')
-    $lines.Add('PAGES VISITED:')
-    foreach($p in $pages){
-        $lines.Add(('  [{0}] {1}  {2}' -f $p.Status,(Redact $p.Url),(Redact $p.Title)))
-    }
-    $lines.Add('')
-    $lines.Add('METER/READING CANDIDATES:')
-    if($hits.Count -eq 0){
-        $lines.Add('  NONE FOUND')
-    } else {
-        foreach($h in $hits | Sort-Object Type,Target -Unique){
-            $lines.Add(('  {0} | page={1} | target={2} | {3}' -f $h.Type,(Redact $h.Page),(Redact $h.Target),(Redact $h.Text)))
-        }
-    }
-
     $lines | Set-Content -LiteralPath $OutFile -Encoding UTF8
-    [Windows.Forms.MessageBox]::Show(
-        "Диагностика завершена.`r`nНичего на портал не отправлялось.`r`n`r`nОтчёт:`r`n$OutFile",
-        'Domlight - счётчики',
-        'OK',
-        'Information'
-    ) | Out-Null
+    [Windows.Forms.MessageBox]::Show("Диагностика структуры счётчиков завершена.`r`nНичего на портал не отправлялось.`r`n`r`nОтчёт:`r`n$OutFile",'Domlight - счётчики','OK','Information')|Out-Null
     Start-Process notepad.exe ('"'+$OutFile+'"')
 }
 catch {
-    [Windows.Forms.MessageBox]::Show($_.Exception.Message,'Domlight - диагностика счётчиков','OK','Error') | Out-Null
+    [Windows.Forms.MessageBox]::Show($_.Exception.Message,'Domlight - диагностика счётчиков','OK','Error')|Out-Null
     exit 1
 }
