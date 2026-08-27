@@ -1,7 +1,7 @@
 {
-  "version": "v113 RELEASE",
+  "version": "v114 RELEASE",
   "published": "2026-08-27",
-  "notes": "Fixes MeterDiscovery on Windows PowerShell 5.1 by loading System.Security before decrypting the saved Domlight session. Read-only diagnostic only; local data, receipts and settings are preserved.",
+  "notes": "Meter discovery now runs with the same live Domlight WebSession as the authenticated client, eliminating cross-process session mismatch. Discovery remains read-only; local data, receipts and settings are preserved.",
   "files": [
     {
       "path": "MeterDiscovery.ps1",
