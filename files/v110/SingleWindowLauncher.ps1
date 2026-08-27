@@ -18,7 +18,7 @@ $hash=([BitConverter]::ToString($sha.ComputeHash($bytes))).Replace('-','').Subst
 $mutexName='Local\DomlightWindow_'+$hash
 $pidFile=Join-Path $DataDir ('window_'+($Key -replace '[^0-9A-Za-z_-]','_')+'.pid')
 $created=$false
-$mutex=New-Object Threading.Mutex($true,$mutexName,[ref]$created)
+$mutex=[Threading.Mutex]::new($true,$mutexName,[ref]$created)
 
 function Activate-Existing {
     try {
@@ -41,6 +41,7 @@ if(-not $created){
     exit 0
 }
 
+$filter=$null
 try {
     $PID.ToString() | Set-Content -LiteralPath $pidFile -Encoding ASCII
 
@@ -72,7 +73,7 @@ public sealed class DomlightEscapeFilter : IMessageFilter {
     & $Script
 }
 finally {
-    try{[Windows.Forms.Application]::RemoveMessageFilter($filter)}catch{}
+    if($null-ne$filter){try{[Windows.Forms.Application]::RemoveMessageFilter($filter)}catch{}}
     try{Remove-Item -LiteralPath $pidFile -Force -ErrorAction SilentlyContinue}catch{}
     try{$mutex.ReleaseMutex()}catch{}
     try{$mutex.Dispose()}catch{}
