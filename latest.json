@@ -1,11 +1,72 @@
 {
-  "version": "v104 STABLE BASELINE",
-  "published": "2026-08-25",
-  "notes": "Verified stable baseline. Preserves local data.",
+  "version": "v106 RELEASE",
+  "published": "2026-08-27",
+  "notes": "Stable release. Account lifecycle, full addresses, responsive account status UI, permanent exclusion/restore, and safe background checks. Preserves local data and receipt archive.",
   "files": [
     {
+      "path": "AccountState.ps1",
+      "url": "https://raw.githubusercontent.com/antjustdevelops/Domlight-Releases/main/files/v106/AccountState.ps1",
+      "sha256": "26b1ba0fb9cbea863f57470a934e6d5547001548c0fa97148006f0a3a1297175"
+    },
+    {
+      "path": "AccountStatus.ps1",
+      "url": "https://raw.githubusercontent.com/antjustdevelops/Domlight-Releases/main/files/v106/AccountStatus.ps1",
+      "sha256": "94d7c861535b2b036368bc762f8937254bdffc3e19d1bf81916ea0e0dea4e85f"
+    },
+    {
+      "path": "AutoCheck.ps1",
+      "url": "https://raw.githubusercontent.com/antjustdevelops/Domlight-Releases/main/files/v106/AutoCheck.ps1",
+      "sha256": "550cba8ab348bfd7e6c96160d348ce59650a2f767675905e79168e77b5501361"
+    },
+    {
+      "path": "ConfigureAutoCheckTask.ps1",
+      "url": "https://raw.githubusercontent.com/antjustdevelops/Domlight-Releases/main/files/v106/ConfigureAutoCheckTask.ps1",
+      "sha256": "d0d5e6ed10a913ea88b9b21839f77e947ac8d5b6b502168f30d7ef5479862ae6"
+    },
+    {
+      "path": "DISABLE_AUTO_CHECK.bat",
+      "url": "https://raw.githubusercontent.com/antjustdevelops/Domlight-Releases/main/files/v106/DISABLE_AUTO_CHECK.bat",
+      "sha256": "3f043354fbb40d4431e5f5b252076b43c730e16daf809d4d1256f189f6291658"
+    },
+    {
+      "path": "Domlight.ps1",
+      "url": "https://raw.githubusercontent.com/antjustdevelops/Domlight-Releases/main/files/v106/Domlight.ps1",
+      "sha256": "d4eda4b9e1955122cdd3dffe39d04bc97326c8c57ac2fc5ff919598be1b7900d"
+    },
+    {
+      "path": "ENABLE_AUTO_CHECK.bat",
+      "url": "https://raw.githubusercontent.com/antjustdevelops/Domlight-Releases/main/files/v106/ENABLE_AUTO_CHECK.bat",
+      "sha256": "d87e7b845bb8977d8c6a4da8516e4168c91beb3a5b2a5acf7c4fc6dbb5328c70"
+    },
+    {
+      "path": "MENU_DOMLIGHT.ps1",
+      "url": "https://raw.githubusercontent.com/antjustdevelops/Domlight-Releases/main/files/v106/MENU_DOMLIGHT.ps1",
+      "sha256": "81ab79310929afde45966dd75afca4f9c1feeb0f20c1578b6f2878721c17ab85"
+    },
+    {
+      "path": "OrganizeDownloadedAccount.ps1",
+      "url": "https://raw.githubusercontent.com/antjustdevelops/Domlight-Releases/main/files/v106/OrganizeDownloadedAccount.ps1",
+      "sha256": "1aea55d8361bfe4368d83181165283f3fb6931ee0a4bb98e17807597ec415879"
+    },
+    {
       "path": "RunAutoCheckHidden.ps1",
-      "url": "https://raw.githubusercontent.com/antjustdevelops/Domlight-Releases/main/files/v104/RunAutoCheckHidden.ps1"
+      "url": "https://raw.githubusercontent.com/antjustdevelops/Domlight-Releases/main/files/v106/RunAutoCheckHidden.ps1",
+      "sha256": "bd3366ae7d4adcda5f491ad1bd43347164d04acd6bd58fda08199522de70b582"
+    },
+    {
+      "path": "UpdateFromGitHub.ps1",
+      "url": "https://raw.githubusercontent.com/antjustdevelops/Domlight-Releases/main/files/v106/UpdateFromGitHub.ps1",
+      "sha256": "481d2d4fbc5d90b2c7e59d4e39810f1701c82c86a284c6c149657e9626640d7e"
+    },
+    {
+      "path": "V106_RELEASE_NOTES.txt",
+      "url": "https://raw.githubusercontent.com/antjustdevelops/Domlight-Releases/main/files/v106/V106_RELEASE_NOTES.txt",
+      "sha256": "f627c94ddc3c373da883eb48c8f674602e89fc41a50fec979cd55ca1eb26607e"
+    },
+    {
+      "path": "VERSION.txt",
+      "url": "https://raw.githubusercontent.com/antjustdevelops/Domlight-Releases/main/files/v106/VERSION.txt",
+      "sha256": "391c7dfa344862c1447e47e8908f2530ece1681a5a1ec0f9db91c794b4a13eea"
     }
   ]
 }
