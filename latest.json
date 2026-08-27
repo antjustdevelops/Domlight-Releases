@@ -1,11 +1,15 @@
 {
-  "version": "v107 RELEASE",
+  "version": "v108 RELEASE",
   "published": "2026-08-27",
-  "notes": "Hotfix for Windows PowerShell 5.1: fixes AccountStatus.ps1 encoding so the 'Лицевые счета / статус' window opens correctly. Preserves all local data and receipts.",
+  "notes": "Restores the visible in-app update button and keeps the Windows PowerShell 5.1 AccountStatus encoding fix. Preserves all local data and receipts.",
   "files": [
     {
+      "path": "MENU_DOMLIGHT.ps1",
+      "url": "https://raw.githubusercontent.com/antjustdevelops/Domlight-Releases/main/files/v108/MENU_DOMLIGHT.ps1"
+    },
+    {
       "path": "AccountStatus.ps1",
-      "url": "https://raw.githubusercontent.com/antjustdevelops/Domlight-Releases/main/files/v107/AccountStatus.ps1"
+      "url": "https://raw.githubusercontent.com/antjustdevelops/Domlight-Releases/main/files/v108/AccountStatus.ps1"
     }
   ]
 }
