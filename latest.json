@@ -1,15 +1,15 @@
 {
-  "version": "v108 RELEASE",
+  "version": "v109 RELEASE",
   "published": "2026-08-27",
-  "notes": "Restores the visible in-app update button and keeps the Windows PowerShell 5.1 AccountStatus encoding fix. Preserves all local data and receipts.",
+  "notes": "Consolidates account-status address handling into one canonical flow. Repairs missing address metadata from the local receipt archive, scans all available PDFs until a full address is found, preserves account lifecycle/exclusion rules, local data and receipts.",
   "files": [
     {
-      "path": "MENU_DOMLIGHT.ps1",
-      "url": "https://raw.githubusercontent.com/antjustdevelops/Domlight-Releases/main/files/v108/MENU_DOMLIGHT.ps1"
+      "path": "AccountStatus.ps1",
+      "url": "https://raw.githubusercontent.com/antjustdevelops/Domlight-Releases/main/files/v109/AccountStatus.ps1"
     },
     {
-      "path": "AccountStatus.ps1",
-      "url": "https://raw.githubusercontent.com/antjustdevelops/Domlight-Releases/main/files/v108/AccountStatus.ps1"
+      "path": "OrganizeDownloadedAccount.ps1",
+      "url": "https://raw.githubusercontent.com/antjustdevelops/Domlight-Releases/main/files/v109/OrganizeDownloadedAccount.ps1"
     }
   ]
 }
