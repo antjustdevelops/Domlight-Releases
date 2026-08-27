@@ -1,11 +1,11 @@
 {
-  "version": "v117 RELEASE",
-  "published": "2026-08-27",
-  "notes": "Fixes Windows PowerShell 5.1 parser errors in the read-only meter JavaScript diagnostic. The script now uses simple separate parsers for buttons, links and inputs while keeping live-session meter analysis read-only. Local data, receipts and settings are preserved.",
+  "version": "v118 RELEASE",
+  "published": "2026-08-28",
+  "notes": "Adds a read-only 'Meters / readings' window that scans active Domlight accounts, switches each account on the portal, and displays meter type, number, current value, previous-period value, last transmission date, unit and verification info. No meter readings can be submitted in this version. Local data, receipts and settings are preserved.",
   "files": [
     {
-      "path": "MeterDiscovery.ps1",
-      "url": "https://raw.githubusercontent.com/antjustdevelops/Domlight-Releases/main/tools/MeterDiscovery.ps1"
+      "path": "MeterStatus.ps1",
+      "url": "https://raw.githubusercontent.com/antjustdevelops/Domlight-Releases/main/files/v118/MeterStatus.ps1"
     }
   ]
 }
