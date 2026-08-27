@@ -1,0 +1,14 @@
+﻿Domlight v106 RELEASE
+Published: 2026-08-26
+
+Key changes:
+- Persistent account lifecycle: Active / Temporarily missing / Inactive.
+- Missing account becomes inactive after 3 successful portal checks without it.
+- Returning account automatically becomes active and resets miss count.
+- Manual permanent exclusion from Domlight with optional local receipt deletion.
+- Excluded accounts can be shown and restored.
+- Full property address shown for each account.
+- Responsive account table with vertical/horizontal scroll as needed.
+- Background Auto Check hardened for hidden scheduled execution.
+- Background task uses production name: Domlight Auto Check.
+- Local data and receipt archive are never included in the release package and are protected by updater rules.
