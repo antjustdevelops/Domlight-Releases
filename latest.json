@@ -1,7 +1,7 @@
 {
-  "version": "v115 RELEASE",
+  "version": "v116 RELEASE",
   "published": "2026-08-27",
-  "notes": "Expands the read-only meter diagnostic to inspect /meter/index structure, including meter-related links, input names, form methods/actions and visible meter text. No meter readings are submitted. Local data, receipts and settings are preserved.",
+  "notes": "Expands the read-only meter diagnostic to inspect interactive elements and JavaScript used by the meter page, including onclick/data attributes and meter-related AJAX code. No meter readings are submitted. Local data, receipts and settings are preserved.",
   "files": [
     {
       "path": "MeterDiscovery.ps1",
