@@ -1,19 +1,11 @@
 {
-  "version": "v111 RELEASE",
+  "version": "v112 RELEASE",
   "published": "2026-08-27",
-  "notes": "Cumulative production repair release. Reinstalls the complete account-state/background-check base from v106, keeps the verified full-address recovery from v109, and keeps the single-instance/Escape child-window behavior from v110. Preserves all local data, receipts and user settings.",
+  "notes": "Adds a read-only MeterDiscovery diagnostic tool. It uses the saved Domlight session to find meter and reading pages without sending data. Local data, receipts and settings are preserved.",
   "files": [
-    {"path":"AccountState.ps1","url":"https://raw.githubusercontent.com/antjustdevelops/Domlight-Releases/main/files/v106/AccountState.ps1"},
-    {"path":"AutoCheck.ps1","url":"https://raw.githubusercontent.com/antjustdevelops/Domlight-Releases/main/files/v106/AutoCheck.ps1"},
-    {"path":"ConfigureAutoCheckTask.ps1","url":"https://raw.githubusercontent.com/antjustdevelops/Domlight-Releases/main/files/v106/ConfigureAutoCheckTask.ps1"},
-    {"path":"DISABLE_AUTO_CHECK.bat","url":"https://raw.githubusercontent.com/antjustdevelops/Domlight-Releases/main/files/v106/DISABLE_AUTO_CHECK.bat"},
-    {"path":"Domlight.ps1","url":"https://raw.githubusercontent.com/antjustdevelops/Domlight-Releases/main/files/v106/Domlight.ps1"},
-    {"path":"ENABLE_AUTO_CHECK.bat","url":"https://raw.githubusercontent.com/antjustdevelops/Domlight-Releases/main/files/v106/ENABLE_AUTO_CHECK.bat"},
-    {"path":"RunAutoCheckHidden.ps1","url":"https://raw.githubusercontent.com/antjustdevelops/Domlight-Releases/main/files/v106/RunAutoCheckHidden.ps1"},
-    {"path":"UpdateFromGitHub.ps1","url":"https://raw.githubusercontent.com/antjustdevelops/Domlight-Releases/main/files/v106/UpdateFromGitHub.ps1"},
-    {"path":"AccountStatus.ps1","url":"https://raw.githubusercontent.com/antjustdevelops/Domlight-Releases/main/files/v109/AccountStatus.ps1"},
-    {"path":"OrganizeDownloadedAccount.ps1","url":"https://raw.githubusercontent.com/antjustdevelops/Domlight-Releases/main/files/v109/OrganizeDownloadedAccount.ps1"},
-    {"path":"MENU_DOMLIGHT.ps1","url":"https://raw.githubusercontent.com/antjustdevelops/Domlight-Releases/main/files/v110/MENU_DOMLIGHT.ps1"},
-    {"path":"SingleWindowLauncher.ps1","url":"https://raw.githubusercontent.com/antjustdevelops/Domlight-Releases/main/files/v110/SingleWindowLauncher.ps1"}
+    {
+      "path": "MeterDiscovery.ps1",
+      "url": "https://raw.githubusercontent.com/antjustdevelops/Domlight-Releases/main/tools/MeterDiscovery.ps1"
+    }
   ]
 }
