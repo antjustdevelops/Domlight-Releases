@@ -1,7 +1,7 @@
 {
-  "version": "v116 RELEASE",
+  "version": "v117 RELEASE",
   "published": "2026-08-27",
-  "notes": "Expands the read-only meter diagnostic to inspect interactive elements and JavaScript used by the meter page, including onclick/data attributes and meter-related AJAX code. No meter readings are submitted. Local data, receipts and settings are preserved.",
+  "notes": "Fixes Windows PowerShell 5.1 parser errors in the read-only meter JavaScript diagnostic. The script now uses simple separate parsers for buttons, links and inputs while keeping live-session meter analysis read-only. Local data, receipts and settings are preserved.",
   "files": [
     {
       "path": "MeterDiscovery.ps1",
