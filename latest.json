@@ -1,7 +1,7 @@
 {
-  "version": "v114 RELEASE",
+  "version": "v115 RELEASE",
   "published": "2026-08-27",
-  "notes": "Meter discovery now runs with the same live Domlight WebSession as the authenticated client, eliminating cross-process session mismatch. Discovery remains read-only; local data, receipts and settings are preserved.",
+  "notes": "Expands the read-only meter diagnostic to inspect /meter/index structure, including meter-related links, input names, form methods/actions and visible meter text. No meter readings are submitted. Local data, receipts and settings are preserved.",
   "files": [
     {
       "path": "MeterDiscovery.ps1",
