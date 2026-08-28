@@ -91,7 +91,7 @@
                   {
                       "path":  "SelfCheck.ps1",
                       "url":  "https://raw.githubusercontent.com/antjustdevelops/Domlight-Releases/main/files/v137/SelfCheck.ps1",
-                      "gitBlobSha":  "b7831de83104dd103c223d3b429fc7f1bb9cfcde"
+                      "gitBlobSha":  "7fd936d4e5de2cec52e25f1540150691d88c4afb"
                   },
                   {
                       "path":  "SingleWindowLauncher.ps1",
