@@ -1,0 +1,54 @@
+name: Build v135 full baseline
+
+on:
+  push:
+    branches: [v135-full-baseline]
+    paths:
+      - '.github/workflows/build-v135.yml'
+      - 'build/v135/**'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: v135-full-baseline
+          fetch-depth: 0
+      - name: Build full baseline
+        shell: pwsh
+        run: |
+          $ErrorActionPreference='Stop'
+          $src='files/v134';$dst='files/v135'
+          if(Test-Path $dst){Remove-Item $dst -Recurse -Force}
+          New-Item -ItemType Directory -Force -Path $dst|Out-Null
+          Get-ChildItem $src -File|ForEach-Object{Copy-Item $_.FullName (Join-Path $dst $_.Name) -Force}
+          foreach($name in @('ConnectionSettings.ps1','Mailing.ps1','PdfEngine.ps1','SelfCheck.ps1')){Copy-Item (Join-Path 'build/v135' $name) (Join-Path $dst $name) -Force}
+
+          # Full baseline has no required external icon dependency.
+          $menuPath=Join-Path $dst 'MENU_DOMLIGHT.ps1'
+          $menu=Get-Content $menuPath -Raw
+          $menu=$menu -replace '\$IconFile\s*=\s*Join-Path\s+\$Root\s+"Domlight\.ico"','\$IconFile = $null'
+          $menu=$menu -replace 'if\(Test-Path \$IconFile\)\{try\{\$form\.Icon=New-Object Drawing\.Icon\(\$IconFile\)\}catch\{\}\}',''
+          Set-Content $menuPath $menu -Encoding UTF8
+
+          & (Join-Path $dst 'SelfCheck.ps1') -Root $dst
+          if($LASTEXITCODE-ne 0){throw 'SelfCheck failed'}
+
+          $managed=@(Get-ChildItem $dst -File | Where-Object {$_.Name -notin @('PROJECT_STRUCTURE.md')} | Select-Object -ExpandProperty Name | Sort-Object)
+          function Get-GitBlobSha([string]$Path){$bytes=[IO.File]::ReadAllBytes($Path);$header=[Text.Encoding]::ASCII.GetBytes(('blob '+$bytes.Length+[char]0));$all=New-Object byte[] ($header.Length+$bytes.Length);[Buffer]::BlockCopy($header,0,$all,0,$header.Length);[Buffer]::BlockCopy($bytes,0,$all,$header.Length,$bytes.Length);$sha=[Security.Cryptography.SHA1]::Create();try{(($sha.ComputeHash($all)|ForEach-Object{$_.ToString('x2')})-join'')}finally{$sha.Dispose()}}
+          $files=@();foreach($name in $managed){$p=Join-Path $dst $name;$files+=[ordered]@{path=$name;url="https://raw.githubusercontent.com/antjustdevelops/Domlight-Releases/main/files/v135/$name";gitBlobSha=(Get-GitBlobSha $p)}}
+          [ordered]@{version='v135 RELEASE';published='2026-08-28';notes='FULL baseline: complete managed runtime, no required local script fragments, dependency self-check, canonical connection settings, mailing preparation module, PDF engine dependency included, meter submission still disabled, data untouched.';files=$files}|ConvertTo-Json -Depth 6|Set-Content 'build/v135/latest.v135.json' -Encoding UTF8
+      - name: Commit generated baseline
+        shell: bash
+        run: |
+          if [ -z "$(git status --porcelain -- files/v135 build/v135/latest.v135.json)" ]; then exit 0; fi
+          git config user.name 'domlight-build'
+          git config user.email 'domlight-build@users.noreply.github.com'
+          git add files/v135 build/v135/latest.v135.json
+          git commit -m 'Build v135 full baseline'
+          git push origin HEAD:v135-full-baseline
