@@ -23,16 +23,14 @@ function Read-Utf8File {
     return [IO.File]::ReadAllText($Path,[Text.Encoding]::UTF8)
 }
 
-function Get-GitBlobSha {
-    param([string]$Path)
-    $bytes=[IO.File]::ReadAllBytes($Path)
-    $header=[Text.Encoding]::ASCII.GetBytes(('blob '+$bytes.Length+[char]0))
-    $combined=New-Object byte[] ($header.Length+$bytes.Length)
-    [Buffer]::BlockCopy($header,0,$combined,0,$header.Length)
-    [Buffer]::BlockCopy($bytes,0,$combined,$header.Length,$bytes.Length)
-    $sha=[Security.Cryptography.SHA1]::Create()
-    try { return (($sha.ComputeHash($combined) | ForEach-Object { $_.ToString('x2') }) -join '') }
-    finally { $sha.Dispose() }
+function Get-StagedBlobSha {
+    param([string]$RepoRelativePath)
+    $spec=':'+($RepoRelativePath.Replace('\','/'))
+    $value=& git rev-parse $spec 2>$null
+    if($LASTEXITCODE -ne 0 -or [string]::IsNullOrWhiteSpace([string]$value)) {
+        throw ('Cannot resolve staged Git blob: '+$RepoRelativePath)
+    }
+    return ([string]$value).Trim()
 }
 
 function Assert-ParseClean {
@@ -115,8 +113,7 @@ foreach($name in @('Mailing.ps1','ConnectionSettings.ps1','SingleWindowLauncher.
     Copy-Item -LiteralPath $source -Destination (Join-Path $OutputDir $name) -Force
 }
 
-# Domlight cabinet: keep all verified receipt/login logic, but make construction testable
-# and do not perform a portal request before the first window is shown.
+# Domlight cabinet: preserve verified business logic but remove portal I/O before first paint.
 $domPath=Join-Path $OutputDir 'Domlight.ps1'
 $dom=Read-Utf8File $domPath
 $dom=$dom.TrimStart([char[]]@([char]0xFEFF,[char]13,[char]10))
@@ -157,10 +154,9 @@ if(-not $rx.IsMatch($dom)) { throw 'Domlight startup block not found; refusing t
 $dom=$rx.Replace($dom,[Text.RegularExpressions.MatchEvaluator]{param($m)$startupReplacement},1)
 Write-Utf8BomFile $domPath $dom
 
-# The installed version file is now part of the full snapshot.
 Write-Utf8BomFile (Join-Path $OutputDir 'VERSION.txt') ('Domlight '+$Version+"`r`n")
 
-# Normalize ALL PowerShell scripts, including unchanged legacy core, to a PS5.1-safe encoding.
+# Windows PowerShell 5.1 requires BOM for reliable Cyrillic parsing.
 foreach($f in @(Get-ChildItem -LiteralPath $OutputDir -Filter *.ps1 -File)) {
     $text=Read-Utf8File $f.FullName
     $text=$text.TrimStart([char]0xFEFF)
@@ -174,7 +170,7 @@ Write-Host 'Running structural SelfCheck...'
 & (Join-Path $OutputDir 'SelfCheck.ps1') -Root $OutputDir
 if($LASTEXITCODE -ne 0) { throw 'SelfCheck failed.' }
 
-# Smoke-test the exact three entry points involved in the user-visible v136 regressions.
+# Smoke-test the three user-visible entry points that regressed in v136.
 $smokeRoot=Join-Path $env:TEMP ('domlight_v137_smoke_'+[guid]::NewGuid().ToString('N'))
 try {
     Copy-Item -LiteralPath $OutputDir -Destination $smokeRoot -Recurse -Force
@@ -190,13 +186,19 @@ finally {
     Remove-Item -LiteralPath $smokeRoot -Recurse -Force -ErrorAction SilentlyContinue
 }
 
-# Generate a manifest from the exact bytes that passed validation.
+# Stage release files FIRST. Manifest SHA must be the exact blob SHA Git will serve,
+# not a pre-clean-filter hash of the Windows working-tree bytes.
+& git add -- files/v137
+if($LASTEXITCODE -ne 0) { throw 'git add files/v137 failed.' }
+
 $manifestFiles=@()
 foreach($f in @(Get-ChildItem -LiteralPath $OutputDir -File | Sort-Object Name)) {
+    $relative=('files/v137/'+$f.Name)
+    $blob=Get-StagedBlobSha $relative
     $manifestFiles += [ordered]@{
         path=$f.Name
         url=('https://raw.githubusercontent.com/antjustdevelops/Domlight-Releases/main/files/v137/'+$f.Name)
-        gitBlobSha=(Get-GitBlobSha $f.FullName)
+        gitBlobSha=$blob
     }
 }
 
@@ -212,7 +214,10 @@ $candidateJson=$candidate | ConvertTo-Json -Depth 6
 $actualCount=@(Get-ChildItem -LiteralPath $OutputDir -File).Count
 if(@($candidate.files).Count -ne $actualCount) { throw 'Candidate manifest/file count mismatch.' }
 foreach($item in @($candidate.files)) {
+    $path='files/v137/'+[string]$item.path
     if(-not(Test-Path -LiteralPath (Join-Path $OutputDir ([string]$item.path)))) { throw ('Candidate manifest target missing: '+[string]$item.path) }
+    $actualBlob=Get-StagedBlobSha $path
+    if($actualBlob -ne [string]$item.gitBlobSha) { throw ('Manifest staged SHA mismatch: '+[string]$item.path) }
 }
 
-Write-Host ('BUILD_OK '+$Version+'; files='+$actualCount)
+Write-Host ('BUILD_OK '+$Version+'; files='+$actualCount+'; manifest-sha-source=git-index')
