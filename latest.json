@@ -1,11 +1,11 @@
 {
-  "version": "v119 RELEASE",
+  "version": "v120 RELEASE",
   "published": "2026-08-28",
-  "notes": "Fixes Windows PowerShell 5.1 compatibility in the read-only meters window by using explicit .NET constructors for cookies and proxy credentials. No meter readings can be submitted. Local data, receipts and settings are preserved.",
+  "notes": "Rebuilds the read-only meters window session loader using the same cookie-array handling as the working Domlight client. This fixes cookie names being merged into one invalid cookie. Meter reading submission remains disabled; local data, receipts and settings are preserved.",
   "files": [
     {
       "path": "MeterStatus.ps1",
-      "url": "https://raw.githubusercontent.com/antjustdevelops/Domlight-Releases/main/files/v118/MeterStatus.ps1"
+      "url": "https://raw.githubusercontent.com/antjustdevelops/Domlight-Releases/main/files/v120/MeterStatus.ps1"
     }
   ]
 }
