@@ -6,107 +6,107 @@
                   {
                       "path":  "AccountState.ps1",
                       "url":  "https://raw.githubusercontent.com/antjustdevelops/Domlight-Releases/main/files/v137/AccountState.ps1",
-                      "gitBlobSha":  "9c987e42fbaae660aa0103bb226664be6e3cd436"
+                      "gitBlobSha":  "0521a6bf852a201df5cf0986650939a52fa34c61"
                   },
                   {
                       "path":  "AccountStatus.ps1",
                       "url":  "https://raw.githubusercontent.com/antjustdevelops/Domlight-Releases/main/files/v137/AccountStatus.ps1",
-                      "gitBlobSha":  "5b70cf225f314e872cdd3272b00e6e099eca0e82"
+                      "gitBlobSha":  "7013dfd669d61603dc161d15692855bd36060422"
                   },
                   {
                       "path":  "AutoCheck.ps1",
                       "url":  "https://raw.githubusercontent.com/antjustdevelops/Domlight-Releases/main/files/v137/AutoCheck.ps1",
-                      "gitBlobSha":  "73e3ade6418a31cd7bb9af9105c998c90aa85069"
+                      "gitBlobSha":  "e40b3aa89bbd8d9d90a7b8e403d5f03f3424c63f"
                   },
                   {
                       "path":  "ConfigureAutoCheckTask.ps1",
                       "url":  "https://raw.githubusercontent.com/antjustdevelops/Domlight-Releases/main/files/v137/ConfigureAutoCheckTask.ps1",
-                      "gitBlobSha":  "3cfbc1eb1673b44d4632d9ae52cf133cac69346b"
+                      "gitBlobSha":  "c817ffd32f1fa9b42c4569328f0eb23b2a77a54d"
                   },
                   {
                       "path":  "ConnectionSettings.ps1",
                       "url":  "https://raw.githubusercontent.com/antjustdevelops/Domlight-Releases/main/files/v137/ConnectionSettings.ps1",
-                      "gitBlobSha":  "240d984273173a5898c52ccd81aa6538bd176a0a"
+                      "gitBlobSha":  "eb649e93e855e15e8c825456696f16959b92ca6e"
                   },
                   {
                       "path":  "DISABLE_AUTO_CHECK.bat",
                       "url":  "https://raw.githubusercontent.com/antjustdevelops/Domlight-Releases/main/files/v137/DISABLE_AUTO_CHECK.bat",
-                      "gitBlobSha":  "0383eaa58a1d42a51bae531f28239020406608a9"
+                      "gitBlobSha":  "eb6e2ca52d0ff92b505457565940cacca58f98aa"
                   },
                   {
                       "path":  "Domlight.ps1",
                       "url":  "https://raw.githubusercontent.com/antjustdevelops/Domlight-Releases/main/files/v137/Domlight.ps1",
-                      "gitBlobSha":  "c3bff4fd151ab3afc8609ec064278d05f95a88ba"
+                      "gitBlobSha":  "743b720de1421c229ec616b98d6eb3df114a4c4e"
                   },
                   {
                       "path":  "DomlightLauncher.vbs",
                       "url":  "https://raw.githubusercontent.com/antjustdevelops/Domlight-Releases/main/files/v137/DomlightLauncher.vbs",
-                      "gitBlobSha":  "fe54dcd26b1909f0cb7cedfa916ea40707a012f2"
+                      "gitBlobSha":  "e3a7fd209d09fa7274dfb7abbdebaf932e0834ee"
                   },
                   {
                       "path":  "DomlightPortal.ps1",
                       "url":  "https://raw.githubusercontent.com/antjustdevelops/Domlight-Releases/main/files/v137/DomlightPortal.ps1",
-                      "gitBlobSha":  "cf4db50c9b42ba8584ad2174068006956368762e"
+                      "gitBlobSha":  "b15d2a027a8db0d4d02a857ebddaef9588a1819e"
                   },
                   {
                       "path":  "ENABLE_AUTO_CHECK.bat",
                       "url":  "https://raw.githubusercontent.com/antjustdevelops/Domlight-Releases/main/files/v137/ENABLE_AUTO_CHECK.bat",
-                      "gitBlobSha":  "560b50288e8988ef39df2d2e14690f75eeaa0a12"
+                      "gitBlobSha":  "f2758ef04388873745843d11c0f83a699da1fa98"
                   },
                   {
                       "path":  "Mailing.ps1",
                       "url":  "https://raw.githubusercontent.com/antjustdevelops/Domlight-Releases/main/files/v137/Mailing.ps1",
-                      "gitBlobSha":  "f72ff0e6e59aa431181e8cca7a4d89994c7962b4"
+                      "gitBlobSha":  "505adc98b9274d356e7de4098125433d2dedf974"
                   },
                   {
                       "path":  "MENU_DOMLIGHT.ps1",
                       "url":  "https://raw.githubusercontent.com/antjustdevelops/Domlight-Releases/main/files/v137/MENU_DOMLIGHT.ps1",
-                      "gitBlobSha":  "fa23e4574219f1c8c6b89e21842c52a9a65ce792"
+                      "gitBlobSha":  "b1b776d660fdb53ae410dac58eb947c63b9f7b64"
                   },
                   {
                       "path":  "MeterStatus.ps1",
                       "url":  "https://raw.githubusercontent.com/antjustdevelops/Domlight-Releases/main/files/v137/MeterStatus.ps1",
-                      "gitBlobSha":  "8088f443eb0ab9ccd5dda67417bae130928b671a"
+                      "gitBlobSha":  "08682729396dff214f67dae3d8a13a5592382e60"
                   },
                   {
                       "path":  "OrganizeDownloadedAccount.ps1",
                       "url":  "https://raw.githubusercontent.com/antjustdevelops/Domlight-Releases/main/files/v137/OrganizeDownloadedAccount.ps1",
-                      "gitBlobSha":  "852d7f5cd3b7434f4266b0ad6f57e7df494bf4fc"
+                      "gitBlobSha":  "21b465f17fc0632890195d43b2b0081ad65f81be"
                   },
                   {
                       "path":  "PdfEngine.ps1",
                       "url":  "https://raw.githubusercontent.com/antjustdevelops/Domlight-Releases/main/files/v137/PdfEngine.ps1",
-                      "gitBlobSha":  "85cc0b080d7c7b4614ab955fa370804872bb4793"
+                      "gitBlobSha":  "61f83970e5f4a19dc92c8a2fb607f99c07152379"
                   },
                   {
                       "path":  "PROJECT_STRUCTURE.md",
                       "url":  "https://raw.githubusercontent.com/antjustdevelops/Domlight-Releases/main/files/v137/PROJECT_STRUCTURE.md",
-                      "gitBlobSha":  "5fdb7c3b9a190fdb96061178acded69f149723c6"
+                      "gitBlobSha":  "813f309ddcad064773f0e94e075471444e58a6f4"
                   },
                   {
                       "path":  "RunAutoCheckHidden.ps1",
                       "url":  "https://raw.githubusercontent.com/antjustdevelops/Domlight-Releases/main/files/v137/RunAutoCheckHidden.ps1",
-                      "gitBlobSha":  "223b6d11fe3a816530c8fc1c3e7c244693fb13e3"
+                      "gitBlobSha":  "69178900f9708cbbbcf26b8687b9c4bd6cab4c48"
                   },
                   {
                       "path":  "SelfCheck.ps1",
                       "url":  "https://raw.githubusercontent.com/antjustdevelops/Domlight-Releases/main/files/v137/SelfCheck.ps1",
-                      "gitBlobSha":  "cd88dca86681ee6ba66f1bccc8698916b4c474dd"
+                      "gitBlobSha":  "b7831de83104dd103c223d3b429fc7f1bb9cfcde"
                   },
                   {
                       "path":  "SingleWindowLauncher.ps1",
                       "url":  "https://raw.githubusercontent.com/antjustdevelops/Domlight-Releases/main/files/v137/SingleWindowLauncher.ps1",
-                      "gitBlobSha":  "67e2f0899e62821d735ea4685f40b65afebbe74e"
+                      "gitBlobSha":  "c6505c19e7ccd86e550845eff27aed73c62a3304"
                   },
                   {
                       "path":  "UpdateFromGitHub.ps1",
                       "url":  "https://raw.githubusercontent.com/antjustdevelops/Domlight-Releases/main/files/v137/UpdateFromGitHub.ps1",
-                      "gitBlobSha":  "0bb2ec71b0c42fa93216e10359e0c4e6dec58bc1"
+                      "gitBlobSha":  "c367650f8ac72de6a1920a677688e2030b8c96a8"
                   },
                   {
                       "path":  "VERSION.txt",
                       "url":  "https://raw.githubusercontent.com/antjustdevelops/Domlight-Releases/main/files/v137/VERSION.txt",
-                      "gitBlobSha":  "8949297c1c00259ed8000451b2b40075f1e1475e"
+                      "gitBlobSha":  "d05be5ead10782763d366c3c948be876dda32612"
                   }
               ]
 }
