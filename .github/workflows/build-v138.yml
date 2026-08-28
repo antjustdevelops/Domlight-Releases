@@ -12,9 +12,30 @@ jobs:
         with:
           ref: v138-meter-drafts
           fetch-depth: 0
-      - name: Build and verify v138
-        shell: powershell
+      - name: Build and test v138
+        shell: pwsh
         run: ./build/v138/Build-v138.ps1
+      - name: Validate runtime on Windows PowerShell 5.1
+        shell: powershell
+        run: |
+          $ErrorActionPreference='Stop'
+          foreach($ps1 in @(Get-ChildItem -LiteralPath 'files/v138' -Filter *.ps1 -File)) {
+            $tokens=$null
+            $errors=$null
+            [void][Management.Automation.Language.Parser]::ParseFile($ps1.FullName,[ref]$tokens,[ref]$errors)
+            if(@($errors).Count -gt 0) { throw ('PS5.1 parser error in '+$ps1.Name+': '+$errors[0].Message) }
+          }
+          . .\files\v138\MeterDraftStore.ps1
+          $testRoot=Join-Path $env:RUNNER_TEMP 'domlight-v138-ps51-test'
+          if(Test-Path $testRoot){Remove-Item $testRoot -Recurse -Force}
+          New-Item -ItemType Directory -Force -Path $testRoot|Out-Null
+          $testFile=Join-Path $testRoot 'meter_drafts.json'
+          $drafts=@{}
+          $drafts['ACC001|M001']=[pscustomobject]@{Selected=$true;Value='123.45'}
+          Export-MeterDraftStore -Drafts $drafts -Path $testFile
+          $loaded=Import-MeterDraftStore -Path $testFile
+          if(-not $loaded.ContainsKey('ACC001|M001')){throw 'PS5.1 draft reload failed'}
+          if([string]$loaded['ACC001|M001'].Value -ne '123.45'){throw 'PS5.1 draft value mismatch'}
       - name: Commit generated v138
         shell: bash
         run: |
