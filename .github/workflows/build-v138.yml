@@ -1,7 +1,7 @@
 name: Build v138 persistent meter drafts
 on:
   push:
-    branches: [v138-meter-drafts]
+    branches: [v138-release-guard]
 permissions:
   contents: write
 jobs:
@@ -10,12 +10,12 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: v138-meter-drafts
+          ref: v138-release-guard
           fetch-depth: 0
       - name: Build and test v138
         shell: pwsh
         run: ./build/v138/Build-v138.ps1
-      - name: Validate runtime on Windows PowerShell 5.1
+      - name: Validate runtime and manifest on Windows PowerShell 5.1
         shell: powershell
         run: |
           $ErrorActionPreference='Stop'
@@ -36,11 +36,19 @@ jobs:
           $loaded=Import-MeterDraftStore -Path $testFile
           if(-not $loaded.ContainsKey('ACC001|M001')){throw 'PS5.1 draft reload failed'}
           if([string]$loaded['ACC001|M001'].Value -ne '123.45'){throw 'PS5.1 draft value mismatch'}
+
+          $manifestPath=(Resolve-Path '.\latest.json').Path
+          $bytes=[IO.File]::ReadAllBytes($manifestPath)
+          if($bytes.Length -ge 3 -and $bytes[0] -eq 0xEF -and $bytes[1] -eq 0xBB -and $bytes[2] -eq 0xBF){throw 'latest.json contains UTF-8 BOM'}
+          $manifest=Get-Content -LiteralPath $manifestPath -Raw | ConvertFrom-Json
+          if([string]::IsNullOrWhiteSpace([string]$manifest.version)){throw 'Manifest version missing under PS5.1'}
+          if(@($manifest.files).Count -eq 0){throw 'Manifest files missing under PS5.1'}
+          if([string]$manifest.version -ne 'v138 RELEASE'){throw 'Unexpected manifest version'}
       - name: Commit generated v138
         shell: bash
         run: |
           git config user.name "Domlight Build"
           git config user.email "actions@users.noreply.github.com"
           if [ -z "$(git status --porcelain -- files/v138 latest.json)" ]; then exit 0; fi
-          git commit -m "Generate v138 persistent meter drafts baseline"
-          git push origin HEAD:v138-meter-drafts
+          git commit -m "Generate guarded v138 persistent meter drafts baseline"
+          git push origin HEAD:v138-release-guard
