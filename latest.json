@@ -1,11 +1,11 @@
 {
-  "version": "v120 RELEASE",
+  "version": "v121 RELEASE",
   "published": "2026-08-28",
-  "notes": "Rebuilds the read-only meters window session loader using the same cookie-array handling as the working Domlight client. This fixes cookie names being merged into one invalid cookie. Meter reading submission remains disabled; local data, receipts and settings are preserved.",
+  "notes": "Audited read-only meters window. Session loading and account switching now follow the same proven flow as the stable Domlight client and AutoCheck module. Meter parsing is hardened to keep type, number, value, date and verification data within each individual meter card. Meter reading submission remains disabled. The window still uses the normal service POST /account/set only to switch accounts, exactly as the stable receipt checker does. Local data, receipts and settings are preserved.",
   "files": [
     {
       "path": "MeterStatus.ps1",
-      "url": "https://raw.githubusercontent.com/antjustdevelops/Domlight-Releases/main/files/v120/MeterStatus.ps1"
+      "url": "https://raw.githubusercontent.com/antjustdevelops/Domlight-Releases/main/files/v121/MeterStatus.ps1"
     }
   ]
 }
