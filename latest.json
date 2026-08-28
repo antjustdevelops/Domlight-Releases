@@ -1,16 +1,16 @@
 {
-  "version": "v129 RELEASE",
+  "version": "v130 RELEASE",
   "published": "2026-08-28",
-  "notes": "Structural updater release. Adds file-level verification with Git blob hashes, repair of mismatched files even when the version number already matches, staged downloads, backup before replacement, verification after installation and rollback on failure. Includes the verified responsive MeterStatus UI from v128. Meter submission remains disabled.",
+  "notes": "Clean structural release. Keeps the stable Domlight base untouched, replaces only UpdateFromGitHub.ps1 and MeterStatus.ps1, verifies managed files by checksum, supports same-version repair, stages downloads, backs up originals, verifies after install, and rolls back on failure. MeterStatus is the verified responsive object-first build; meter submission remains disabled.",
   "files": [
     {
       "path": "UpdateFromGitHub.ps1",
-      "url": "https://raw.githubusercontent.com/antjustdevelops/Domlight-Releases/main/files/v129/UpdateFromGitHub.ps1",
-      "gitBlobSha": "bf435a949d64e7dd45570824e9d7eff716eddb17"
+      "url": "https://raw.githubusercontent.com/antjustdevelops/Domlight-Releases/main/files/v130/UpdateFromGitHub.ps1",
+      "gitBlobSha": "1344fad223ac87a7547f7d473b9d3ed1db4f3e23"
     },
     {
       "path": "MeterStatus.ps1",
-      "url": "https://raw.githubusercontent.com/antjustdevelops/Domlight-Releases/main/files/v129/MeterStatus.ps1",
+      "url": "https://raw.githubusercontent.com/antjustdevelops/Domlight-Releases/main/files/v130/MeterStatus.ps1",
       "gitBlobSha": "78793c1265b30877aea4d778bf0f0f7957c839bd"
     }
   ]
