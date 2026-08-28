@@ -1,11 +1,11 @@
 {
-  "version": "v122 RELEASE",
+  "version": "v123 RELEASE",
   "published": "2026-08-28",
-  "notes": "Updates the audited meters window to use the current-month transmission model: 'Current' becomes 'Last reading'; the old previous-period column is removed; a calculated current-month status (Sent / Not sent) is added based on the portal's 'Передавали' date; an editable 'Новое показание' field is available only when the current month is not yet sent; verification information remains visible. Meter reading submission to /meter/value is still disabled. The only POST used is the proven /account/set service call for switching accounts.",
+  "notes": "Reworks the meters UI into a scalable object-first structure intended to map cleanly to the future Klyuchi app: one row per property/account, shortened address, search and month-status filters, and a separate property dialog containing that account's meters. Draft new readings and per-meter send selections are kept separately from portal state inside the running session. Meter submission to /meter/value remains disabled. Account switching continues to use the same proven /account/set flow as stable Domlight.",
   "files": [
     {
       "path": "MeterStatus.ps1",
-      "url": "https://raw.githubusercontent.com/antjustdevelops/Domlight-Releases/main/files/v122/MeterStatus.ps1"
+      "url": "https://raw.githubusercontent.com/antjustdevelops/Domlight-Releases/main/files/v123/MeterStatus.ps1"
     }
   ]
 }
