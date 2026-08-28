@@ -1,17 +1,21 @@
 {
-  "version": "v132 RELEASE",
+  "version": "v133 RELEASE",
   "published": "2026-08-28",
-  "notes": "Fixes the compact-window sizing crash in MeterStatus under Windows PowerShell 5.1 by using explicit integer arithmetic and scalar dimensions. Main window and object card remain compact by default and resizable. Portal/session/status logic is unchanged; meter submission remains disabled.",
+  "notes": "First consolidated Domlight baseline. Replaces the patch-chain model with a complete managed core set. Keeps user data untouched. Adds Meters / readings to the main menu through SingleWindowLauncher, reads the displayed version from VERSION.txt, and manages all core files by checksum through the v130 updater. Local-only Mailing.ps1 and ConnectionSettings.ps1 are intentionally not managed or replaced.",
   "files": [
-    {
-      "path": "UpdateFromGitHub.ps1",
-      "url": "https://raw.githubusercontent.com/antjustdevelops/Domlight-Releases/main/files/v130/UpdateFromGitHub.ps1",
-      "gitBlobSha": "1344fad223ac87a7547f7d473b9d3ed1db4f3e23"
-    },
-    {
-      "path": "MeterStatus.ps1",
-      "url": "https://raw.githubusercontent.com/antjustdevelops/Domlight-Releases/main/files/v132/MeterStatus.ps1",
-      "gitBlobSha": "08682729396dff214f67dae3d8a13a5592382e60"
-    }
+    {"path":"AccountState.ps1","url":"https://raw.githubusercontent.com/antjustdevelops/Domlight-Releases/main/files/v133/AccountState.ps1","gitBlobSha":"0521a6bf852a201df5cf0986650939a52fa34c61"},
+    {"path":"AccountStatus.ps1","url":"https://raw.githubusercontent.com/antjustdevelops/Domlight-Releases/main/files/v133/AccountStatus.ps1","gitBlobSha":"7013dfd669d61603dc161d15692855bd36060422"},
+    {"path":"AutoCheck.ps1","url":"https://raw.githubusercontent.com/antjustdevelops/Domlight-Releases/main/files/v133/AutoCheck.ps1","gitBlobSha":"3d059b62d4df75d4ca00a634309dfe4c1ac28ade"},
+    {"path":"ConfigureAutoCheckTask.ps1","url":"https://raw.githubusercontent.com/antjustdevelops/Domlight-Releases/main/files/v133/ConfigureAutoCheckTask.ps1","gitBlobSha":"c817ffd32f1fa9b42c4569328f0eb23b2a77a54d"},
+    {"path":"DISABLE_AUTO_CHECK.bat","url":"https://raw.githubusercontent.com/antjustdevelops/Domlight-Releases/main/files/v133/DISABLE_AUTO_CHECK.bat","gitBlobSha":"eb6e2ca52d0ff92b505457565940cacca58f98aa"},
+    {"path":"Domlight.ps1","url":"https://raw.githubusercontent.com/antjustdevelops/Domlight-Releases/main/files/v133/Domlight.ps1","gitBlobSha":"8745cf88f53f0745b388e8f13783fb771c99c642"},
+    {"path":"DomlightLauncher.vbs","url":"https://raw.githubusercontent.com/antjustdevelops/Domlight-Releases/main/files/v133/DomlightLauncher.vbs","gitBlobSha":"e3a7fd209d09fa7274dfb7abbdebaf932e0834ee"},
+    {"path":"ENABLE_AUTO_CHECK.bat","url":"https://raw.githubusercontent.com/antjustdevelops/Domlight-Releases/main/files/v133/ENABLE_AUTO_CHECK.bat","gitBlobSha":"f2758ef04388873745843d11c0f83a699da1fa98"},
+    {"path":"MENU_DOMLIGHT.ps1","url":"https://raw.githubusercontent.com/antjustdevelops/Domlight-Releases/main/files/v133/MENU_DOMLIGHT.ps1","gitBlobSha":"b1b776d660fdb53ae410dac58eb947c63b9f7b64"},
+    {"path":"MeterStatus.ps1","url":"https://raw.githubusercontent.com/antjustdevelops/Domlight-Releases/main/files/v133/MeterStatus.ps1","gitBlobSha":"08682729396dff214f67dae3d8a13a5592382e60"},
+    {"path":"OrganizeDownloadedAccount.ps1","url":"https://raw.githubusercontent.com/antjustdevelops/Domlight-Releases/main/files/v133/OrganizeDownloadedAccount.ps1","gitBlobSha":"21b465f17fc0632890195d43b2b0081ad65f81be"},
+    {"path":"RunAutoCheckHidden.ps1","url":"https://raw.githubusercontent.com/antjustdevelops/Domlight-Releases/main/files/v133/RunAutoCheckHidden.ps1","gitBlobSha":"7fd653e8a2f753477e7afaab3d01a15cf1b275f5"},
+    {"path":"SingleWindowLauncher.ps1","url":"https://raw.githubusercontent.com/antjustdevelops/Domlight-Releases/main/files/v133/SingleWindowLauncher.ps1","gitBlobSha":"45eff5bbe9362c9c45d4c9883d5401f9210e5da0"},
+    {"path":"UpdateFromGitHub.ps1","url":"https://raw.githubusercontent.com/antjustdevelops/Domlight-Releases/main/files/v133/UpdateFromGitHub.ps1","gitBlobSha":"1344fad223ac87a7547f7d473b9d3ed1db4f3e23"}
   ]
 }
