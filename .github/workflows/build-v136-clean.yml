@@ -12,7 +12,8 @@ jobs:
         with:
           ref: v136-clean-baseline
           fetch-depth: 0
-      - name: Materialize full v136
+
+      - name: Materialize and verify full v136
         shell: pwsh
         run: |
           $ErrorActionPreference='Stop'
@@ -35,28 +36,30 @@ jobs:
           & (Join-Path $dst 'SelfCheck.ps1') -Root $dst
           if($LASTEXITCODE -ne 0){throw 'SelfCheck failed'}
 
-          function Get-GitBlobSha([string]$Path){
-            $bytes=[IO.File]::ReadAllBytes($Path)
-            $header=[Text.Encoding]::ASCII.GetBytes(('blob '+$bytes.Length+[char]0))
-            $all=New-Object byte[] ($header.Length+$bytes.Length)
-            [Buffer]::BlockCopy($header,0,$all,0,$header.Length)
-            [Buffer]::BlockCopy($bytes,0,$all,$header.Length,$bytes.Length)
-            $sha=[Security.Cryptography.SHA1]::Create()
-            try{return (($sha.ComputeHash($all)|ForEach-Object{$_.ToString('x2')})-join '')}finally{$sha.Dispose()}
-          }
-
+      - name: Stage runtime and generate exact manifest
+        shell: pwsh
+        run: |
+          $ErrorActionPreference='Stop'
+          git add files/v136
+          $dst='files/v136'
           $managed=@(Get-ChildItem $dst -File | Select-Object -ExpandProperty Name | Sort-Object)
           $files=@()
           foreach($name in $managed){
-            $p=Join-Path $dst $name
-            $files += [ordered]@{path=$name;url="https://raw.githubusercontent.com/antjustdevelops/Domlight-Releases/main/files/v136/$name";gitBlobSha=(Get-GitBlobSha $p)}
+            $repoPath=('files/v136/'+$name)
+            $entry=(& git ls-files -s -- $repoPath)
+            if([string]::IsNullOrWhiteSpace([string]$entry)){throw ('File is not staged: '+$repoPath)}
+            $parts=([string]$entry -split '\s+')
+            if($parts.Count -lt 3){throw ('Cannot read staged blob for: '+$repoPath)}
+            $blob=$parts[1]
+            $files += [ordered]@{path=$name;url="https://raw.githubusercontent.com/antjustdevelops/Domlight-Releases/main/files/v136/$name";gitBlobSha=$blob}
           }
           [ordered]@{
             version='v136 RELEASE'
             published='2026-08-29'
-            notes='CLEAN FULL BASELINE: physical self-contained runtime in files/v136; verified PowerShell syntax and dependencies; clean installer creates a new folder and migrates data without modifying the old installation; meter submission remains disabled.'
+            notes='CLEAN FULL BASELINE: physical self-contained runtime in files/v136; verified PowerShell syntax and dependencies; checksums are generated from staged Git blobs; clean installer creates a new folder and migrates data without modifying the old installation; meter submission remains disabled.'
             files=$files
           } | ConvertTo-Json -Depth 6 | Set-Content 'latest.json' -Encoding UTF8
+
       - name: Commit generated clean baseline
         shell: bash
         run: |
