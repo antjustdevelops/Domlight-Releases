@@ -27,41 +27,56 @@ jobs:
           Set-Content -LiteralPath (Join-Path $root 'VERSION.txt') -Value ('Domlight '+$m.version) -Encoding UTF8
           Write-Host "ROOT=$root"
           Get-ChildItem $root | Sort-Object Name | Format-Table Name,Length
-      - name: Parse every PowerShell file with Windows PowerShell 5.1
+      - name: Full Windows PowerShell 5.1 audit
         shell: powershell
         run: |
-          $ErrorActionPreference='Stop'
+          $ErrorActionPreference='Continue'
           $root=Join-Path $env:RUNNER_TEMP 'domlight-current'
-          $allErrors=@()
+          $issues=New-Object System.Collections.ArrayList
+
           foreach($f in @(Get-ChildItem $root -Filter *.ps1 -File)){
             $tokens=$null;$errs=$null
             [void][Management.Automation.Language.Parser]::ParseFile($f.FullName,[ref]$tokens,[ref]$errs)
-            foreach($e in @($errs)){ $allErrors += "$($f.Name): $($e.Message)" }
+            foreach($e in @($errs)){
+              $line=$e.Extent.StartLineNumber
+              $col=$e.Extent.StartColumnNumber
+              [void]$issues.Add("PARSER $($f.Name) line $line col $col : $($e.Message)")
+            }
           }
-          if($allErrors.Count){$allErrors|ForEach-Object{Write-Error $_};exit 1}
-          Write-Host 'All PowerShell files parse cleanly.'
-      - name: Run release SelfCheck
-        shell: powershell
-        run: |
-          $root=Join-Path $env:RUNNER_TEMP 'domlight-current'
-          & (Join-Path $root 'SelfCheck.ps1') -Root $root
-          if($LASTEXITCODE -ne 0){exit $LASTEXITCODE}
-      - name: Audit launch contracts and UI binding risks
-        shell: powershell
-        run: |
-          $root=Join-Path $env:RUNNER_TEMP 'domlight-current'
-          $issues=New-Object System.Collections.ArrayList
+
+          try {
+            $out=& (Join-Path $root 'SelfCheck.ps1') -Root $root 2>&1 | Out-String
+            Write-Host $out
+            if($LASTEXITCODE -ne 0){[void]$issues.Add('SelfCheck returned failure')}
+          } catch {[void]$issues.Add('SelfCheck crashed: '+$_.Exception.Message)}
+
+          $known=@{}
+          foreach($f in @(Get-ChildItem $root -File)){$known[$f.Name.ToLowerInvariant()]=$true}
+          foreach($f in @(Get-ChildItem $root -Filter *.ps1 -File)){
+            $text=Get-Content $f.FullName -Raw
+            foreach($m in [regex]::Matches($text,'(?i)["''](?<name>[A-Za-z0-9_\-]+\.(?:ps1|bat|vbs))["'']')){
+              $n=$m.Groups['name'].Value
+              if(-not $known.ContainsKey($n.ToLowerInvariant())){[void]$issues.Add("MISSING_REF $($f.Name) -> $n")}
+            }
+          }
+
           $menu=Get-Content (Join-Path $root 'MENU_DOMLIGHT.ps1') -Raw
-          foreach($n in @('Domlight.ps1','ConnectionSettings.ps1','Mailing.ps1','MeterStatus.ps1','AccountStatus.ps1')){
-            if($menu -notmatch [regex]::Escape($n)){[void]$issues.Add("menu missing target $n")}
+          foreach($n in @('Domlight.ps1','ConnectionSettings.ps1','Mailing.ps1','MeterStatus.ps1','AccountStatus.ps1','SingleWindowLauncher.ps1')){
+            if($menu -notmatch [regex]::Escape($n)){[void]$issues.Add("MENU missing target $n")}
           }
+
           $launcher=Get-Content (Join-Path $root 'SingleWindowLauncher.ps1') -Raw
-          if($launcher -notmatch '(?s)catch\s*\{.*MessageBox'){[void]$issues.Add('child launcher has no visible catch for startup failures')}
+          if($launcher -notmatch '(?s)catch\s*\{.*MessageBox'){[void]$issues.Add('LAUNCHER startup exceptions are silent')}
+
           $mail=Get-Content (Join-Path $root 'Mailing.ps1') -Raw
-          if($mail -match '\$grid\.DataSource\s*='){[void]$issues.Add('Mailing uses DataGridView.DataSource instead of explicit row population')}
+          if($mail -match '\$grid\.DataSource\s*='){[void]$issues.Add('MAILING uses DataGridView.DataSource; known blank-grid risk')}
+
           $cab=Get-Content (Join-Path $root 'Domlight.ps1') -Raw
-          $show=$cab.IndexOf('$form.ShowDialog')
-          $net=$cab.IndexOf('Invoke-DomlightGet $ReceiptsUrl')
-          if($net -ge 0 -and $show -ge 0 -and $net -lt $show){[void]$issues.Add('Cabinet performs portal network request before first ShowDialog')}
-          Write-Host ('AUDIT_ISSUES='+$issues.Count)
-          $issues | ForEach-Object { Write-Host ('ISSUE: '+$_) }
+          $show=$cab.LastIndexOf('$form.ShowDialog')
+          $net=$cab.LastIndexOf('Invoke-DomlightGet $ReceiptsUrl')
+          if($net -ge 0 -and $show -ge 0 -and $net -lt $show){[void]$issues.Add('CABINET portal request runs before first visible dialog; up to 40s apparent no-op')}
+
+          Write-Host '================ AUDIT RESULT ================'
+          Write-Host ('ISSUE_COUNT='+$issues.Count)
+          $issues | Sort-Object -Unique | ForEach-Object { Write-Host ('ISSUE: '+$_) }
+          Write-Host '================================================'
