@@ -20,173 +20,19 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Build full candidate
+      - name: Build and validate candidate
         shell: powershell
         run: |
-          $ErrorActionPreference='Stop'
-          $manifest=Get-Content latest.json -Raw -Encoding UTF8 | ConvertFrom-Json
-          $out=Join-Path $PWD 'files\v137'
-          if(Test-Path -LiteralPath $out){Remove-Item -LiteralPath $out -Recurse -Force}
-          New-Item -ItemType Directory -Force -Path $out | Out-Null
-
-          foreach($f in @($manifest.files)){
-            $needle='/antjustdevelops/Domlight-Releases/main/'
-            $url=[string]$f.url
-            $idx=$url.IndexOf($needle)
-            if($idx -lt 0){throw "Unsupported manifest URL: $url"}
-            $repoPath=$url.Substring($idx+$needle.Length).Replace('/','\')
-            if(-not(Test-Path -LiteralPath $repoPath)){throw "Manifest source missing: $repoPath"}
-            Copy-Item -LiteralPath $repoPath -Destination (Join-Path $out ([string]$f.path)) -Force
-          }
-
-          foreach($name in @('Mailing.ps1','ConnectionSettings.ps1','SingleWindowLauncher.ps1','SelfCheck.ps1','PROJECT_STRUCTURE.md')){
-            Copy-Item -LiteralPath (Join-Path 'build\v137' $name) -Destination (Join-Path $out $name) -Force
-          }
-
-          $domPath=Join-Path $out 'Domlight.ps1'
-          $dom=[IO.File]::ReadAllText($domPath,[Text.Encoding]::UTF8)
-          $dom=$dom.TrimStart([char]0xFEFF,"`r","`n")
-          if($dom -notmatch '^param\(\[switch\]\$SmokeTest\)'){$dom="param([switch]`$SmokeTest)`r`n`r`n"+$dom}
-
-          $pattern='(?s)\r?\ntry \{\r?\n    Add-Type -AssemblyName System\.Web.*?\r?\nRefresh-LastCheck\r?\n\[void\]\$form\.ShowDialog\(\)\s*$'
-          $replacementLines=@(
-            '',
-            'if ($SmokeTest) {',
-            "    Write-Output 'SMOKE_OK Domlight'",
-            '    $form.Dispose()',
-            '    return',
-            '}',
-            '',
-            '# POST-SHOW NETWORK CHECK: the cabinet window is painted before portal I/O.',
-            '$script:StartupChecked=$false',
-            '$form.Add_Shown({',
-            '    if($script:StartupChecked){return}',
-            '    $script:StartupChecked=$true',
-            '    [System.Windows.Forms.Application]::DoEvents()',
-            '    try {',
-            '        Add-Type -AssemblyName System.Web',
-            '        Load-Session',
-            '        try {',
-            '            $r = Invoke-DomlightGet $ReceiptsUrl',
-            '            if (Is-Authenticated $r.Content) {',
-            '                $lblStatus.Text = "Подключено"',
-            '                $lblStatus.ForeColor = [Drawing.Color]::Green',
-            '                $btnSync.Enabled = $true',
-            '                Log "Домлайт уже подключён. Можно сразу скачивать квитанции."',
-            '            } else {',
-            '                Log "Введите телефон и получите SMS."',
-            '            }',
-            '        } catch {',
-            '            Log "Введите телефон и получите SMS."',
-            '        }',
-            '    } catch {',
-            '        Log "Старт: $($_.Exception.Message)"',
-            '    }',
-            '})',
-            '',
-            'Refresh-LastCheck',
-            '[void]$form.ShowDialog()',
-            ''
-          )
-          $replacement=$replacementLines -join "`r`n"
-          $rx=New-Object Text.RegularExpressions.Regex($pattern)
-          if(-not $rx.IsMatch($dom)){throw 'Domlight startup block not found; refusing unsafe build.'}
-          $dom=$rx.Replace($dom,[Text.RegularExpressions.MatchEvaluator]{param($m)$replacement},1)
-          [IO.File]::WriteAllText($domPath,$dom,(New-Object Text.UTF8Encoding($true)))
-
-          foreach($name in @('ConnectionSettings.ps1','Mailing.ps1')){
-            $p=Join-Path $out $name
-            $t=[IO.File]::ReadAllText($p,[Text.Encoding]::UTF8)
-            $t=$t.Replace(';exit 0}',';return}')
-            [IO.File]::WriteAllText($p,$t,(New-Object Text.UTF8Encoding($true)))
-          }
-
-          $launcher=Join-Path $out 'SingleWindowLauncher.ps1'
-          $lt=[IO.File]::ReadAllText($launcher,[Text.Encoding]::UTF8)
-          $old='        & $Script'
-          $new="        if(`$env:DOMLIGHT_SMOKE_TEST -eq '1'){ & `$Script -SmokeTest } else { & `$Script }"
-          if(-not $lt.Contains($old)){throw 'Launcher invocation marker not found.'}
-          $lt=$lt.Replace($old,$new)
-          [IO.File]::WriteAllText($launcher,$lt,(New-Object Text.UTF8Encoding($true)))
-
-          $bom=New-Object Text.UTF8Encoding($true)
-          foreach($p in @(Get-ChildItem -LiteralPath $out -Filter *.ps1 -File)){
-            $t=[IO.File]::ReadAllText($p.FullName,[Text.Encoding]::UTF8).TrimStart([char]0xFEFF)
-            [IO.File]::WriteAllText($p.FullName,$t,$bom)
-          }
-          Set-Content -LiteralPath (Join-Path $out 'VERSION.txt') -Value 'Domlight v137 RELEASE' -Encoding UTF8
-          Get-ChildItem -LiteralPath $out -File | Sort-Object Name | Format-Table Name,Length
-
-      - name: Windows PowerShell 5.1 parser gate
-        shell: powershell
-        run: |
-          $ErrorActionPreference='Stop'
-          $errors=@()
-          foreach($f in @(Get-ChildItem files\v137 -Filter *.ps1 -File)){
-            $tokens=$null;$parse=$null
-            [void][Management.Automation.Language.Parser]::ParseFile($f.FullName,[ref]$tokens,[ref]$parse)
-            foreach($e in @($parse)){$errors += "$($f.Name) line $($e.Extent.StartLineNumber): $($e.Message)"}
-          }
-          if($errors.Count){$errors|ForEach-Object{Write-Host $_};throw 'Parser gate failed.'}
-          Write-Host 'PARSER GATE PASS'
-
-      - name: Structural self-check
-        shell: powershell
-        run: |
-          & .\files\v137\SelfCheck.ps1 -Root (Resolve-Path .\files\v137).Path
-          if($LASTEXITCODE -ne 0){throw 'SelfCheck failed.'}
-
-      - name: UI smoke tests through real child launcher
-        shell: powershell
-        run: |
-          $ErrorActionPreference='Stop'
-          $env:DOMLIGHT_SMOKE_TEST='1'
-          $root=(Resolve-Path .\files\v137).Path
-          foreach($name in @('Domlight.ps1','ConnectionSettings.ps1','Mailing.ps1')){
-            $key='Smoke_'+[IO.Path]::GetFileNameWithoutExtension($name)
-            & (Join-Path $root 'SingleWindowLauncher.ps1') -Script (Join-Path $root $name) -Key $key
-            if($LASTEXITCODE -ne 0){throw "Smoke failed: $name"}
-          }
-          Remove-Item Env:DOMLIGHT_SMOKE_TEST -ErrorAction SilentlyContinue
-          Write-Host 'UI/LAUNCHER SMOKE PASS'
-
-      - name: Generate full manifest
-        shell: powershell
-        run: |
-          $ErrorActionPreference='Stop'
-          function Get-GitBlobSha([string]$Path){
-            $bytes=[IO.File]::ReadAllBytes($Path)
-            $header=[Text.Encoding]::ASCII.GetBytes(('blob '+$bytes.Length+[char]0))
-            $combined=New-Object byte[] ($header.Length+$bytes.Length)
-            [Buffer]::BlockCopy($header,0,$combined,0,$header.Length)
-            [Buffer]::BlockCopy($bytes,0,$combined,$header.Length,$bytes.Length)
-            $sha=[Security.Cryptography.SHA1]::Create()
-            try{return (($sha.ComputeHash($combined)|ForEach-Object{$_.ToString('x2')}) -join '')}finally{$sha.Dispose()}
-          }
-          $root=Join-Path $PWD 'files\v137'
-          $files=@()
-          foreach($f in @(Get-ChildItem -LiteralPath $root -File | Where-Object{$_.Name -ne 'VERSION.txt'} | Sort-Object Name)){
-            $files += [ordered]@{path=$f.Name;url=('https://raw.githubusercontent.com/antjustdevelops/Domlight-Releases/main/files/v137/'+$f.Name);gitBlobSha=(Get-GitBlobSha $f.FullName)}
-          }
-          $m=[ordered]@{version='v137 RELEASE';published='2026-08-29';notes='Structural recovery: PS5.1-safe encoding, complete dependency snapshot, visible child startup errors, cabinet visible before portal I/O, proxy UI smoke-tested, mailing explicit rows, data untouched, meter sending disabled.';files=$files}
-          [IO.File]::WriteAllText((Join-Path $PWD 'build\v137\latest.v137.json'),($m|ConvertTo-Json -Depth 6),(New-Object Text.UTF8Encoding($false)))
-          Write-Host ('MANIFEST FILES='+$files.Count)
-
-      - name: Verify manifest coverage
-        shell: powershell
-        run: |
-          $m=Get-Content build\v137\latest.v137.json -Raw -Encoding UTF8|ConvertFrom-Json
-          $expected=@(Get-ChildItem files\v137 -File|Where-Object{$_.Name -ne 'VERSION.txt'}).Count
-          if(@($m.files).Count -ne $expected){throw 'Manifest coverage mismatch.'}
-          Write-Host 'MANIFEST COVERAGE PASS'
+          & .\build\v137\BuildV137.ps1
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
       - name: Commit verified candidate
         shell: powershell
         run: |
-          git config user.name 'github-actions[bot]'
-          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add files/v137 build/v137/latest.v137.json
           git diff --cached --quiet
-          if($LASTEXITCODE -eq 0){Write-Host 'No generated changes.';exit 0}
-          git commit -m 'Build verified v137 candidate'
+          if ($LASTEXITCODE -eq 0) { Write-Host "No generated changes."; exit 0 }
+          git commit -m "Build verified v137 candidate"
           git push origin HEAD:v137-structural-audit
