@@ -1,0 +1,92 @@
+{
+  "version": "v134 RELEASE",
+  "published": "2026-08-28",
+  "notes": "Clean baseline build: consolidated managed core, single VERSION.txt source for dashboard and cabinet, corrected AutoCheck completion protocol, stronger authentication check, shared DomlightPortal module for all new portal work, checksummed updater, user data untouched.",
+  "files": [
+    {
+      "path": "AccountState.ps1",
+      "url": "https://raw.githubusercontent.com/antjustdevelops/Domlight-Releases/main/files/v134/AccountState.ps1",
+      "gitBlobSha": "0521a6bf852a201df5cf0986650939a52fa34c61"
+    },
+    {
+      "path": "AccountStatus.ps1",
+      "url": "https://raw.githubusercontent.com/antjustdevelops/Domlight-Releases/main/files/v134/AccountStatus.ps1",
+      "gitBlobSha": "7013dfd669d61603dc161d15692855bd36060422"
+    },
+    {
+      "path": "AutoCheck.ps1",
+      "url": "https://raw.githubusercontent.com/antjustdevelops/Domlight-Releases/main/files/v134/AutoCheck.ps1",
+      "gitBlobSha": "14dbdae4a435351862477ce653ab0b21e2b19d91"
+    },
+    {
+      "path": "ConfigureAutoCheckTask.ps1",
+      "url": "https://raw.githubusercontent.com/antjustdevelops/Domlight-Releases/main/files/v134/ConfigureAutoCheckTask.ps1",
+      "gitBlobSha": "c817ffd32f1fa9b42c4569328f0eb23b2a77a54d"
+    },
+    {
+      "path": "DISABLE_AUTO_CHECK.bat",
+      "url": "https://raw.githubusercontent.com/antjustdevelops/Domlight-Releases/main/files/v134/DISABLE_AUTO_CHECK.bat",
+      "gitBlobSha": "eb6e2ca52d0ff92b505457565940cacca58f98aa"
+    },
+    {
+      "path": "Domlight.ps1",
+      "url": "https://raw.githubusercontent.com/antjustdevelops/Domlight-Releases/main/files/v134/Domlight.ps1",
+      "gitBlobSha": "9aa5312dc7f073798cbf3b2873ce7b0dd9cf2d05"
+    },
+    {
+      "path": "DomlightLauncher.vbs",
+      "url": "https://raw.githubusercontent.com/antjustdevelops/Domlight-Releases/main/files/v134/DomlightLauncher.vbs",
+      "gitBlobSha": "e3a7fd209d09fa7274dfb7abbdebaf932e0834ee"
+    },
+    {
+      "path": "ENABLE_AUTO_CHECK.bat",
+      "url": "https://raw.githubusercontent.com/antjustdevelops/Domlight-Releases/main/files/v134/ENABLE_AUTO_CHECK.bat",
+      "gitBlobSha": "f2758ef04388873745843d11c0f83a699da1fa98"
+    },
+    {
+      "path": "MENU_DOMLIGHT.ps1",
+      "url": "https://raw.githubusercontent.com/antjustdevelops/Domlight-Releases/main/files/v134/MENU_DOMLIGHT.ps1",
+      "gitBlobSha": "b1b776d660fdb53ae410dac58eb947c63b9f7b64"
+    },
+    {
+      "path": "MeterStatus.ps1",
+      "url": "https://raw.githubusercontent.com/antjustdevelops/Domlight-Releases/main/files/v134/MeterStatus.ps1",
+      "gitBlobSha": "08682729396dff214f67dae3d8a13a5592382e60"
+    },
+    {
+      "path": "OrganizeDownloadedAccount.ps1",
+      "url": "https://raw.githubusercontent.com/antjustdevelops/Domlight-Releases/main/files/v134/OrganizeDownloadedAccount.ps1",
+      "gitBlobSha": "21b465f17fc0632890195d43b2b0081ad65f81be"
+    },
+    {
+      "path": "RunAutoCheckHidden.ps1",
+      "url": "https://raw.githubusercontent.com/antjustdevelops/Domlight-Releases/main/files/v134/RunAutoCheckHidden.ps1",
+      "gitBlobSha": "3d1856308b5bbf9cf29dded1f662e00849802f1d"
+    },
+    {
+      "path": "SingleWindowLauncher.ps1",
+      "url": "https://raw.githubusercontent.com/antjustdevelops/Domlight-Releases/main/files/v134/SingleWindowLauncher.ps1",
+      "gitBlobSha": "45eff5bbe9362c9c45d4c9883d5401f9210e5da0"
+    },
+    {
+      "path": "UpdateFromGitHub.ps1",
+      "url": "https://raw.githubusercontent.com/antjustdevelops/Domlight-Releases/main/files/v134/UpdateFromGitHub.ps1",
+      "gitBlobSha": "1344fad223ac87a7547f7d473b9d3ed1db4f3e23"
+    },
+    {
+      "path": "DomlightPortal.ps1",
+      "url": "https://raw.githubusercontent.com/antjustdevelops/Domlight-Releases/main/files/v134/DomlightPortal.ps1",
+      "gitBlobSha": "b15d2a027a8db0d4d02a857ebddaef9588a1819e"
+    },
+    {
+      "path": "SelfCheck.ps1",
+      "url": "https://raw.githubusercontent.com/antjustdevelops/Domlight-Releases/main/files/v134/SelfCheck.ps1",
+      "gitBlobSha": "32665d0fa6d8c373aa42ffc99130057037dec174"
+    },
+    {
+      "path": "PROJECT_STRUCTURE.md",
+      "url": "https://raw.githubusercontent.com/antjustdevelops/Domlight-Releases/main/files/v134/PROJECT_STRUCTURE.md",
+      "gitBlobSha": "a5c8f13e83e79386908699c261b80d614ee8f07f"
+    }
+  ]
+}
