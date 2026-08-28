@@ -35,4 +35,6 @@ jobs:
           git diff --cached --quiet
           if ($LASTEXITCODE -eq 0) { Write-Host "No generated changes."; exit 0 }
           git commit -m "Build verified v137 candidate"
+          git fetch origin v137-structural-audit
+          git rebase origin/v137-structural-audit
           git push origin HEAD:v137-structural-audit
