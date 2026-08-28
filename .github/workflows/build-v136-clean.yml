@@ -21,7 +21,7 @@ jobs:
           New-Item -ItemType Directory -Force -Path $dst|Out-Null
           Get-ChildItem $src -File | ForEach-Object { Copy-Item $_.FullName (Join-Path $dst $_.Name) -Force }
           Copy-Item 'files/v134/MENU_DOMLIGHT.ps1' (Join-Path $dst 'MENU_DOMLIGHT.ps1') -Force
-          Copy-Item 'files/v136/SelfCheck.ps1' (Join-Path $dst 'SelfCheck.ps1') -Force
+          Copy-Item 'build/v136/SelfCheck.ps1' (Join-Path $dst 'SelfCheck.ps1') -Force
           Copy-Item 'build/v136/Install-Domlight.ps1' 'Install-Domlight-v136.ps1' -Force
           Copy-Item 'build/v136/INSTALL_DOMLIGHT_v136.cmd' 'INSTALL_DOMLIGHT_v136.cmd' -Force
           Set-Content -LiteralPath (Join-Path $dst 'VERSION.txt') -Value 'Domlight v136 RELEASE' -Encoding UTF8
