@@ -102,5 +102,8 @@ $manifest=[ordered]@{
     notes='Persistent meter drafts: saved meter readings are stored in data/meter_drafts.json for the current month and survive closing/reopening the meters window and Domlight; stale or already transmitted meter drafts are removed; portal submission remains disabled; all v137 runtime behavior otherwise preserved.'
     files=@($files | Sort-Object path)
 }
-[IO.File]::WriteAllText((Join-Path (Get-Location) 'latest.json'),($manifest|ConvertTo-Json -Depth 6),(New-Object Text.UTF8Encoding($true)))
+$manifestPath=Join-Path (Get-Location) 'latest.json'
+[IO.File]::WriteAllText($manifestPath,($manifest|ConvertTo-Json -Depth 6),(New-Object Text.UTF8Encoding($false)))
+$manifestBytes=[IO.File]::ReadAllBytes($manifestPath)
+if($manifestBytes.Length -ge 3 -and $manifestBytes[0] -eq 0xEF -and $manifestBytes[1] -eq 0xBB -and $manifestBytes[2] -eq 0xBF){throw 'latest.json must be UTF-8 without BOM'}
 git add latest.json
