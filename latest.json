@@ -1,11 +1,11 @@
 {
-  "version": "v126 RELEASE",
+  "version": "v125 RELEASE",
   "published": "2026-08-28",
-  "notes": "Clean rebuild of the object-first meters UI for Windows PowerShell 5.1. Keeps the proven portal/session/account-switching logic and current-month status rule, but removes fragile PowerShell array/DataSource binding from the WinForms tables. Object and meter rows are rendered explicitly with DataGridView.Rows.Add, so the UI no longer depends on PowerShell collection binding behavior. Search, shortened addresses, object filters, per-meter draft values, per-meter selection and verification remain. Meter submission to /meter/value remains disabled; only the proven /account/set service POST is used for switching accounts.",
+  "notes": "Verified fallback release. Rebuilds the object-first meters UI in readable Windows PowerShell 5.1 syntax. Meter submission to /meter/value remains disabled; account switching uses the proven /account/set flow.",
   "files": [
     {
       "path": "MeterStatus.ps1",
-      "url": "https://raw.githubusercontent.com/antjustdevelops/Domlight-Releases/main/files/v126/MeterStatus.ps1"
+      "url": "https://raw.githubusercontent.com/antjustdevelops/Domlight-Releases/main/files/v125/MeterStatus.ps1"
     }
   ]
 }
