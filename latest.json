@@ -1,11 +1,11 @@
 {
-  "version": "v123 RELEASE",
+  "version": "v124 RELEASE",
   "published": "2026-08-28",
-  "notes": "Reworks the meters UI into a scalable object-first structure intended to map cleanly to the future Klyuchi app: one row per property/account, shortened address, search and month-status filters, and a separate property dialog containing that account's meters. Draft new readings and per-meter send selections are kept separately from portal state inside the running session. Meter submission to /meter/value remains disabled. Account switching continues to use the same proven /account/set flow as stable Domlight.",
+  "notes": "Fixes Windows PowerShell 5.1 / legacy WinForms compatibility in the new object-first meters UI by removing unsupported TextBox.PlaceholderText and using a normal label plus TextBox. The scalable object -> account meters layout, shortened addresses, month status, draft readings and per-meter selection remain. Meter submission to /meter/value remains disabled.",
   "files": [
     {
       "path": "MeterStatus.ps1",
-      "url": "https://raw.githubusercontent.com/antjustdevelops/Domlight-Releases/main/files/v123/MeterStatus.ps1"
+      "url": "https://raw.githubusercontent.com/antjustdevelops/Domlight-Releases/main/files/v124/MeterStatus.ps1"
     }
   ]
 }
