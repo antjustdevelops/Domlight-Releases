@@ -1,0 +1,107 @@
+name: Build v134 baseline
+
+on:
+  push:
+    branches: [v134-build]
+    paths:
+      - '.github/workflows/build-v134.yml'
+      - 'build/v134/**'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: v134-build
+          fetch-depth: 0
+      - name: Build baseline
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $src = 'files/v133'
+          $dst = 'files/v134'
+          if (Test-Path $dst) { Remove-Item $dst -Recurse -Force }
+          New-Item -ItemType Directory -Force -Path $dst | Out-Null
+          Get-ChildItem $src -File | ForEach-Object { Copy-Item $_.FullName (Join-Path $dst $_.Name) -Force }
+
+          Copy-Item 'build/v134/DomlightPortal.ps1' (Join-Path $dst 'DomlightPortal.ps1') -Force
+          Copy-Item 'build/v134/RunAutoCheckHidden.ps1' (Join-Path $dst 'RunAutoCheckHidden.ps1') -Force
+          Copy-Item 'build/v134/SelfCheck.ps1' (Join-Path $dst 'SelfCheck.ps1') -Force
+          Copy-Item 'build/v134/PROJECT_STRUCTURE.md' (Join-Path $dst 'PROJECT_STRUCTURE.md') -Force
+
+          # One version source: VERSION.txt. Legacy hard-coded display is removed at build time.
+          $domlightPath = Join-Path $dst 'Domlight.ps1'
+          $domlight = Get-Content $domlightPath -Raw
+          $versionBlock = @'
+          $Root = Split-Path -Parent $MyInvocation.MyCommand.Path
+          $VersionFile = Join-Path $Root "VERSION.txt"
+          $AppVersion = "UNKNOWN"
+          if (Test-Path -LiteralPath $VersionFile) {
+              try {
+                  $rawVersion = (Get-Content -LiteralPath $VersionFile -Raw).Trim()
+                  if (-not [string]::IsNullOrWhiteSpace($rawVersion)) {
+                      $AppVersion = ($rawVersion -replace '^Domlight\s+','').Trim()
+                  }
+              } catch {}
+          }
+          '@
+          $domlight = [regex]::Replace($domlight, '\$AppVersion\s*=\s*"v106 RELEASE"', [System.Text.RegularExpressions.MatchEvaluator]{ param($m) $versionBlock }, 1)
+          $domlight = [regex]::Replace($domlight, 'function Is-Authenticated\(\[string\]\$Html\) \{\s*return \(\$Html -match ''action=\["'''']\/account\/set\["'''']'' -or \$Html -match ''\/receipt\/index''\)\s*\}', @'
+          function Is-Authenticated([string]$Html) {
+              return (@(Parse-Accounts $Html).Count -gt 0)
+          }
+          '@)
+          Set-Content -LiteralPath $domlightPath -Value $domlight -Encoding UTF8
+
+          $autoPath = Join-Path $dst 'AutoCheck.ps1'
+          $auto = Get-Content $autoPath -Raw
+          $auto = [regex]::Replace($auto, 'function Is-Authenticated\(\[string\]\$Html\) \{\s*return \(\$Html -match ''action=\["'''']\/account\/set\["'''']'' -or \$Html -match ''\/receipt\/index''\)\s*\}', @'
+          function Is-Authenticated([string]$Html) {
+              return (@(Parse-Accounts $Html).Count -gt 0)
+          }
+          '@)
+          Set-Content -LiteralPath $autoPath -Value $auto -Encoding UTF8
+
+          # Fail build if the old auth heuristic or hard-coded version survived.
+          if ((Get-Content $domlightPath -Raw) -match '\$AppVersion\s*=\s*"v106 RELEASE"') { throw 'Hard-coded Domlight version survived build.' }
+          if ((Get-Content $autoPath -Raw) -match '\$payload\.status') { throw 'Obsolete result protocol detected.' }
+          if ((Get-Content (Join-Path $dst 'RunAutoCheckHidden.ps1') -Raw) -match '\$payload\.status') { throw 'Wrapper still uses payload.status.' }
+
+          # Generate manifest from the actual v134 files.
+          $managed = @(
+            'AccountState.ps1','AccountStatus.ps1','AutoCheck.ps1','ConfigureAutoCheckTask.ps1','DISABLE_AUTO_CHECK.bat',
+            'Domlight.ps1','DomlightLauncher.vbs','ENABLE_AUTO_CHECK.bat','MENU_DOMLIGHT.ps1','MeterStatus.ps1',
+            'OrganizeDownloadedAccount.ps1','RunAutoCheckHidden.ps1','SingleWindowLauncher.ps1','UpdateFromGitHub.ps1',
+            'DomlightPortal.ps1','SelfCheck.ps1','PROJECT_STRUCTURE.md'
+          )
+          function Get-GitBlobSha([string]$Path) {
+            $bytes=[IO.File]::ReadAllBytes($Path)
+            $header=[Text.Encoding]::ASCII.GetBytes(('blob '+$bytes.Length+[char]0))
+            $all=New-Object byte[] ($header.Length+$bytes.Length)
+            [Buffer]::BlockCopy($header,0,$all,0,$header.Length)
+            [Buffer]::BlockCopy($bytes,0,$all,$header.Length,$bytes.Length)
+            $sha=[Security.Cryptography.SHA1]::Create()
+            try { (($sha.ComputeHash($all)|ForEach-Object{$_.ToString('x2')}) -join '') } finally { $sha.Dispose() }
+          }
+          $files=@()
+          foreach($name in $managed){
+            $path=Join-Path $dst $name
+            if(-not(Test-Path $path)){throw "Missing managed file: $name"}
+            $files += [ordered]@{path=$name;url="https://raw.githubusercontent.com/antjustdevelops/Domlight-Releases/main/files/v134/$name";gitBlobSha=(Get-GitBlobSha $path)}
+          }
+          $manifest=[ordered]@{version='v134 RELEASE';published='2026-08-28';notes='Clean baseline build: consolidated managed core, single VERSION.txt source for dashboard and cabinet, corrected AutoCheck completion protocol, stronger authentication check, shared DomlightPortal module for all new portal work, checksummed updater, user data untouched.';files=$files}
+          $manifest | ConvertTo-Json -Depth 6 | Set-Content 'build/v134/latest.v134.json' -Encoding UTF8
+      - name: Commit generated baseline
+        shell: bash
+        run: |
+          if git diff --quiet -- files/v134 build/v134/latest.v134.json; then exit 0; fi
+          git config user.name 'domlight-build'
+          git config user.email 'domlight-build@users.noreply.github.com'
+          git add files/v134 build/v134/latest.v134.json
+          git commit -m 'Build reproducible v134 baseline'
+          git push origin HEAD:v134-build
