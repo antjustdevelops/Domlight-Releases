@@ -1,0 +1,51 @@
+name: Build v139 meter checkbox persistence
+on:
+  push:
+    branches: [v139-meter-checkbox]
+permissions:
+  contents: write
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: v139-meter-checkbox
+          fetch-depth: 0
+      - name: Build and test v139
+        shell: pwsh
+        run: ./build/v139/Build-v139.ps1
+      - name: Validate runtime and manifest on Windows PowerShell 5.1
+        shell: powershell
+        run: |
+          $ErrorActionPreference='Stop'
+          foreach($ps1 in @(Get-ChildItem -LiteralPath 'files/v139' -Filter *.ps1 -File)) {
+            $tokens=$null
+            $errors=$null
+            [void][Management.Automation.Language.Parser]::ParseFile($ps1.FullName,[ref]$tokens,[ref]$errors)
+            if(@($errors).Count -gt 0) { throw ('PS5.1 parser error in '+$ps1.Name+': '+$errors[0].Message) }
+          }
+          $bytes=[IO.File]::ReadAllBytes((Resolve-Path 'latest.json'))
+          if($bytes.Length -ge 3 -and $bytes[0] -eq 0xEF -and $bytes[1] -eq 0xBB -and $bytes[2] -eq 0xBF){throw 'latest.json must be UTF-8 without BOM'}
+          $manifest=Get-Content -LiteralPath 'latest.json' -Raw | ConvertFrom-Json
+          if([string]$manifest.version -ne 'v139 RELEASE'){throw 'Manifest version missing or incorrect'}
+          if(@($manifest.files).Count -lt 20){throw 'Manifest file list incomplete'}
+          . .\files\v139\MeterDraftStore.ps1
+          $testRoot=Join-Path $env:RUNNER_TEMP 'domlight-v139-ps51-test'
+          if(Test-Path $testRoot){Remove-Item $testRoot -Recurse -Force}
+          New-Item -ItemType Directory -Force -Path $testRoot|Out-Null
+          $testFile=Join-Path $testRoot 'meter_drafts.json'
+          $drafts=@{}
+          $drafts['ACC001|M001']=[pscustomobject]@{Selected=$true;Value='123.45'}
+          Export-MeterDraftStore -Drafts $drafts -Path $testFile
+          $loaded=Import-MeterDraftStore -Path $testFile
+          if(-not [bool]$loaded['ACC001|M001'].Selected){throw 'PS5.1 checkbox persistence failed'}
+          if([string]$loaded['ACC001|M001'].Value -ne '123.45'){throw 'PS5.1 draft value mismatch'}
+      - name: Commit generated v139
+        shell: bash
+        run: |
+          git config user.name "Domlight Build"
+          git config user.email "actions@users.noreply.github.com"
+          if [ -z "$(git status --porcelain -- files/v139 latest.json)" ]; then exit 0; fi
+          git commit -m "Generate v139 meter checkbox persistence baseline"
+          git push origin HEAD:v139-meter-checkbox
