@@ -1,7 +1,7 @@
 {
-  "version": "v118 RELEASE",
+  "version": "v119 RELEASE",
   "published": "2026-08-28",
-  "notes": "Adds a read-only 'Meters / readings' window that scans active Domlight accounts, switches each account on the portal, and displays meter type, number, current value, previous-period value, last transmission date, unit and verification info. No meter readings can be submitted in this version. Local data, receipts and settings are preserved.",
+  "notes": "Fixes Windows PowerShell 5.1 compatibility in the read-only meters window by using explicit .NET constructors for cookies and proxy credentials. No meter readings can be submitted. Local data, receipts and settings are preserved.",
   "files": [
     {
       "path": "MeterStatus.ps1",
