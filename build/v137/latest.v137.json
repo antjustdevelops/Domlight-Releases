@@ -96,7 +96,7 @@
                   {
                       "path":  "SingleWindowLauncher.ps1",
                       "url":  "https://raw.githubusercontent.com/antjustdevelops/Domlight-Releases/main/files/v137/SingleWindowLauncher.ps1",
-                      "gitBlobSha":  "c6505c19e7ccd86e550845eff27aed73c62a3304"
+                      "gitBlobSha":  "2b28b54b985e4d9aaa00c8f9666a0d516e9f2a5d"
                   },
                   {
                       "path":  "UpdateFromGitHub.ps1",

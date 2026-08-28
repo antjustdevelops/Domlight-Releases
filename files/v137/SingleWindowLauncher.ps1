@@ -1,6 +1,7 @@
 ﻿param(
     [Parameter(Mandatory=$true)][string]$Script,
-    [Parameter(Mandatory=$true)][string]$Key
+    [Parameter(Mandatory=$true)][string]$Key,
+    [switch]$SmokeTest
 )
 
 $ErrorActionPreference='Stop'
@@ -36,6 +37,7 @@ function Activate-Existing {
 if(-not $created){
     Activate-Existing
     try{$mutex.Dispose()}catch{}
+    if($SmokeTest){throw ('Smoke-test window key already active: '+$Key)}
     exit 0
 }
 
@@ -67,10 +69,11 @@ public sealed class DomlightEscapeFilter : IMessageFilter {
 
     if(-not(Test-Path -LiteralPath $Script)){throw "Не найден файл окна: $Script"}
     try {
-        & $Script
+        if($SmokeTest){ & $Script -SmokeTest } else { & $Script }
     } catch {
         $message="Не удалось открыть окно Domlight.`r`n`r`nМодуль: $([IO.Path]::GetFileName($Script))`r`n$($_.Exception.Message)"
         try{Add-Content -LiteralPath $ErrorLog -Encoding UTF8 -Value ((Get-Date -Format 'yyyy-MM-dd HH:mm:ss')+'  '+$message.Replace("`r`n",' | '))}catch{}
+        if($SmokeTest){throw}
         [Windows.Forms.MessageBox]::Show($message,'Domlight','OK','Error')|Out-Null
     }
 }
