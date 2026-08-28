@@ -1,0 +1,67 @@
+name: audit-v137
+
+on:
+  push:
+    branches: [v137-structural-audit]
+
+jobs:
+  structural-audit:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Materialize current release
+        shell: powershell
+        run: |
+          $ErrorActionPreference='Stop'
+          $m=Get-Content latest.json -Raw | ConvertFrom-Json
+          $root=Join-Path $env:RUNNER_TEMP 'domlight-current'
+          New-Item -ItemType Directory -Force -Path $root | Out-Null
+          foreach($f in @($m.files)) {
+            $needle='/antjustdevelops/Domlight-Releases/main/'
+            $idx=$f.url.IndexOf($needle)
+            if($idx -lt 0){ throw "Unsupported manifest URL: $($f.url)" }
+            $repoPath=$f.url.Substring($idx+$needle.Length).Replace('/','\')
+            if(-not(Test-Path -LiteralPath $repoPath)){ throw "Manifest source missing in repository: $repoPath" }
+            Copy-Item -LiteralPath $repoPath -Destination (Join-Path $root $f.path) -Force
+          }
+          Set-Content -LiteralPath (Join-Path $root 'VERSION.txt') -Value ('Domlight '+$m.version) -Encoding UTF8
+          Write-Host "ROOT=$root"
+          Get-ChildItem $root | Sort-Object Name | Format-Table Name,Length
+      - name: Parse every PowerShell file with Windows PowerShell 5.1
+        shell: powershell
+        run: |
+          $ErrorActionPreference='Stop'
+          $root=Join-Path $env:RUNNER_TEMP 'domlight-current'
+          $allErrors=@()
+          foreach($f in @(Get-ChildItem $root -Filter *.ps1 -File)){
+            $tokens=$null;$errs=$null
+            [void][Management.Automation.Language.Parser]::ParseFile($f.FullName,[ref]$tokens,[ref]$errs)
+            foreach($e in @($errs)){ $allErrors += "$($f.Name): $($e.Message)" }
+          }
+          if($allErrors.Count){$allErrors|ForEach-Object{Write-Error $_};exit 1}
+          Write-Host 'All PowerShell files parse cleanly.'
+      - name: Run release SelfCheck
+        shell: powershell
+        run: |
+          $root=Join-Path $env:RUNNER_TEMP 'domlight-current'
+          & (Join-Path $root 'SelfCheck.ps1') -Root $root
+          if($LASTEXITCODE -ne 0){exit $LASTEXITCODE}
+      - name: Audit launch contracts and UI binding risks
+        shell: powershell
+        run: |
+          $root=Join-Path $env:RUNNER_TEMP 'domlight-current'
+          $issues=New-Object System.Collections.ArrayList
+          $menu=Get-Content (Join-Path $root 'MENU_DOMLIGHT.ps1') -Raw
+          foreach($n in @('Domlight.ps1','ConnectionSettings.ps1','Mailing.ps1','MeterStatus.ps1','AccountStatus.ps1')){
+            if($menu -notmatch [regex]::Escape($n)){[void]$issues.Add("menu missing target $n")}
+          }
+          $launcher=Get-Content (Join-Path $root 'SingleWindowLauncher.ps1') -Raw
+          if($launcher -notmatch '(?s)catch\s*\{.*MessageBox'){[void]$issues.Add('child launcher has no visible catch for startup failures')}
+          $mail=Get-Content (Join-Path $root 'Mailing.ps1') -Raw
+          if($mail -match '\$grid\.DataSource\s*='){[void]$issues.Add('Mailing uses DataGridView.DataSource instead of explicit row population')}
+          $cab=Get-Content (Join-Path $root 'Domlight.ps1') -Raw
+          $show=$cab.IndexOf('$form.ShowDialog')
+          $net=$cab.IndexOf('Invoke-DomlightGet $ReceiptsUrl')
+          if($net -ge 0 -and $show -ge 0 -and $net -lt $show){[void]$issues.Add('Cabinet performs portal network request before first ShowDialog')}
+          Write-Host ('AUDIT_ISSUES='+$issues.Count)
+          $issues | ForEach-Object { Write-Host ('ISSUE: '+$_) }
