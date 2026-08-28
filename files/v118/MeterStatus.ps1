@@ -28,7 +28,7 @@ function Load-WebSession {
     $json = Unprotect-Text $protected
     $arr = @($json | ConvertFrom-Json)
     foreach ($x in $arr) {
-        $cookie = New-Object System.Net.Cookie([string]$x.Name, [string]$x.Value, [string]$x.Path, [string]$x.Domain)
+        $cookie = [System.Net.Cookie]::new([string]$x.Name, [string]$x.Value, [string]$x.Path, [string]$x.Domain)
         $session.Cookies.Add($cookie)
     }
     return $session
@@ -45,7 +45,7 @@ function Get-ProxyArgs {
         $args['ProxyUseDefaultCredentials'] = $false
         if (-not [string]::IsNullOrWhiteSpace([string]$cfg.proxyUser)) {
             $sec = ConvertTo-SecureString ([string]$cfg.proxyPassword) -AsPlainText -Force
-            $args['ProxyCredential'] = New-Object System.Management.Automation.PSCredential ([string]$cfg.proxyUser, $sec)
+            $args['ProxyCredential'] = [System.Management.Automation.PSCredential]::new([string]$cfg.proxyUser, $sec)
         }
     } catch {}
     return $args
