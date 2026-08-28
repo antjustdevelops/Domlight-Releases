@@ -43,6 +43,8 @@ if(Test-Path -LiteralPath $launcher){
     $t=Get-Content -LiteralPath $launcher -Raw -Encoding UTF8
     if($t -notmatch 'window_errors\.log'){[void]$errors.Add('Launcher has no persistent startup error log.')}
     if($t -notmatch '(?s)catch\s*\{.*MessageBox'){[void]$errors.Add('Launcher still hides child startup errors.')}
+    if($t -notmatch '\[switch\]\$SmokeTest'){[void]$errors.Add('Launcher has no smoke-test mode.')}
+    if($t -notmatch '&\s*\$Script\s+-SmokeTest'){[void]$errors.Add('Launcher smoke mode does not invoke child smoke entry point.')}
 }
 
 $mail=Join-Path $Root 'Mailing.ps1'
