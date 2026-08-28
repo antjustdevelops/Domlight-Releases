@@ -63,21 +63,24 @@ function Assert-Utf8Bom {
 function Invoke-SmokeTest {
     param([string]$Root,[string]$ScriptName)
     $scriptPath = Join-Path $Root $ScriptName
+    $launcherPath = Join-Path $Root 'SingleWindowLauncher.ps1'
+    $key='Smoke_'+[IO.Path]::GetFileNameWithoutExtension($ScriptName)+'_'+[guid]::NewGuid().ToString('N').Substring(0,8)
     $stdout = Join-Path $env:TEMP ('domlight_smoke_'+[guid]::NewGuid().ToString('N')+'.out.txt')
     $stderr = Join-Path $env:TEMP ('domlight_smoke_'+[guid]::NewGuid().ToString('N')+'.err.txt')
     try {
         $p = Start-Process powershell.exe -ArgumentList @(
-            '-NoProfile','-ExecutionPolicy','Bypass','-STA','-File',$scriptPath,'-SmokeTest'
+            '-NoProfile','-ExecutionPolicy','Bypass','-STA','-File',$launcherPath,
+            '-Script',$scriptPath,'-Key',$key,'-SmokeTest'
         ) -PassThru -Wait -WindowStyle Hidden -RedirectStandardOutput $stdout -RedirectStandardError $stderr
         $outText = if(Test-Path $stdout){Get-Content $stdout -Raw -ErrorAction SilentlyContinue}else{''}
         $errText = if(Test-Path $stderr){Get-Content $stderr -Raw -ErrorAction SilentlyContinue}else{''}
         if($p.ExitCode -ne 0) {
-            throw ("Smoke test failed: $ScriptName`r`nExit: $($p.ExitCode)`r`n$outText`r`n$errText")
+            throw ("Launcher smoke test failed: $ScriptName`r`nExit: $($p.ExitCode)`r`n$outText`r`n$errText")
         }
         if($outText -notmatch 'SMOKE_OK') {
-            throw ("Smoke test did not report success: $ScriptName`r`n$outText`r`n$errText")
+            throw ("Launcher smoke test did not report success: $ScriptName`r`n$outText`r`n$errText")
         }
-        Write-Host ('SMOKE PASS: '+$ScriptName)
+        Write-Host ('LAUNCHER SMOKE PASS: '+$ScriptName)
     }
     finally {
         Remove-Item $stdout,$stderr -Force -ErrorAction SilentlyContinue
@@ -93,7 +96,6 @@ if(-not $current.files) { throw 'Current manifest has no files list.' }
 if(Test-Path -LiteralPath $OutputDir) { Remove-Item -LiteralPath $OutputDir -Recurse -Force }
 New-Item -ItemType Directory -Force -Path $OutputDir | Out-Null
 
-# Materialize the complete currently published managed application first.
 foreach($item in @($current.files)) {
     $url=[string]$item.url
     $needle='/antjustdevelops/Domlight-Releases/main/'
@@ -106,14 +108,12 @@ foreach($item in @($current.files)) {
     Copy-Item -LiteralPath $source -Destination $dest -Force
 }
 
-# Overlay canonical modules fixed during the structural audit.
 foreach($name in @('Mailing.ps1','ConnectionSettings.ps1','SingleWindowLauncher.ps1','SelfCheck.ps1','PROJECT_STRUCTURE.md')) {
     $source=Join-Path $BuildDir $name
     if(-not(Test-Path -LiteralPath $source)) { throw ('Missing v137 build input: '+$name) }
     Copy-Item -LiteralPath $source -Destination (Join-Path $OutputDir $name) -Force
 }
 
-# Domlight cabinet: preserve verified business logic but remove portal I/O before first paint.
 $domPath=Join-Path $OutputDir 'Domlight.ps1'
 $dom=Read-Utf8File $domPath
 $dom=$dom.TrimStart([char[]]@([char]0xFEFF,[char]13,[char]10))
@@ -156,7 +156,6 @@ Write-Utf8BomFile $domPath $dom
 
 Write-Utf8BomFile (Join-Path $OutputDir 'VERSION.txt') ('Domlight '+$Version+"`r`n")
 
-# Windows PowerShell 5.1 requires BOM for reliable Cyrillic parsing.
 foreach($f in @(Get-ChildItem -LiteralPath $OutputDir -Filter *.ps1 -File)) {
     $text=Read-Utf8File $f.FullName
     $text=$text.TrimStart([char]0xFEFF)
@@ -170,7 +169,6 @@ Write-Host 'Running structural SelfCheck...'
 & (Join-Path $OutputDir 'SelfCheck.ps1') -Root $OutputDir
 if($LASTEXITCODE -ne 0) { throw 'SelfCheck failed.' }
 
-# Smoke-test the three user-visible entry points that regressed in v136.
 $smokeRoot=Join-Path $env:TEMP ('domlight_v137_smoke_'+[guid]::NewGuid().ToString('N'))
 try {
     Copy-Item -LiteralPath $OutputDir -Destination $smokeRoot -Recurse -Force
@@ -186,8 +184,6 @@ finally {
     Remove-Item -LiteralPath $smokeRoot -Recurse -Force -ErrorAction SilentlyContinue
 }
 
-# Stage release files FIRST. Manifest SHA must be the exact blob SHA Git will serve,
-# not a pre-clean-filter hash of the Windows working-tree bytes.
 & git add -- files/v137
 if($LASTEXITCODE -ne 0) { throw 'git add files/v137 failed.' }
 
@@ -205,7 +201,7 @@ foreach($f in @(Get-ChildItem -LiteralPath $OutputDir -File | Sort-Object Name))
 $candidate=[ordered]@{
     version=$Version
     published='2026-08-29'
-    notes='Full structural baseline: complete managed snapshot; every PowerShell file normalized to UTF-8 BOM and parsed by Windows PowerShell 5.1; cabinet, proxy settings and mailing UI smoke-tested; child startup failures are visible and logged; mailing grid uses explicit rows; data is preserved; meter submission remains disabled.'
+    notes='Full structural baseline: complete managed snapshot; every PowerShell file normalized to UTF-8 BOM and parsed by Windows PowerShell 5.1; menu child path smoke-tested through SingleWindowLauncher for cabinet, proxy settings and mailing; child startup failures are visible and logged; mailing grid uses explicit rows; data is preserved; meter submission remains disabled.'
     files=$manifestFiles
 }
 $candidateJson=$candidate | ConvertTo-Json -Depth 6
@@ -220,4 +216,4 @@ foreach($item in @($candidate.files)) {
     if($actualBlob -ne [string]$item.gitBlobSha) { throw ('Manifest staged SHA mismatch: '+[string]$item.path) }
 }
 
-Write-Host ('BUILD_OK '+$Version+'; files='+$actualCount+'; manifest-sha-source=git-index')
+Write-Host ('BUILD_OK '+$Version+'; files='+$actualCount+'; manifest-sha-source=git-index; smoke-path=launcher')
