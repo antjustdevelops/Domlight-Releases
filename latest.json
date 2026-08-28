@@ -1,117 +1,122 @@
 {
-  "version": "v139 RELEASE",
+  "version": "v140 RELEASE",
   "published": "2026-08-29",
-  "notes": "Meter draft checkbox persistence fixed: the Передать checkbox is committed immediately when clicked and again before saving; checked drafts survive closing/reopening the meter card, the meters window and Domlight. Existing persistent draft storage is preserved; meter submission remains disabled; all v138 behavior otherwise preserved.",
+  "notes": "Meter UI rebuilt from the last working v138 baseline. Checkbox persistence is handled by a dedicated MeterGridBehavior module at save time; Build-ObjectRows cannot reference the card grid; persistent drafts are preserved; meter submission remains disabled.",
   "files": [
     {
       "path": "AccountState.ps1",
-      "url": "https://raw.githubusercontent.com/antjustdevelops/Domlight-Releases/main/files/v139/AccountState.ps1",
+      "url": "https://raw.githubusercontent.com/antjustdevelops/Domlight-Releases/main/files/v140/AccountState.ps1",
       "gitBlobSha": "0521a6bf852a201df5cf0986650939a52fa34c61"
     },
     {
       "path": "SingleWindowLauncher.ps1",
-      "url": "https://raw.githubusercontent.com/antjustdevelops/Domlight-Releases/main/files/v139/SingleWindowLauncher.ps1",
+      "url": "https://raw.githubusercontent.com/antjustdevelops/Domlight-Releases/main/files/v140/SingleWindowLauncher.ps1",
       "gitBlobSha": "2b28b54b985e4d9aaa00c8f9666a0d516e9f2a5d"
     },
     {
       "path": "SelfCheck.ps1",
-      "url": "https://raw.githubusercontent.com/antjustdevelops/Domlight-Releases/main/files/v139/SelfCheck.ps1",
+      "url": "https://raw.githubusercontent.com/antjustdevelops/Domlight-Releases/main/files/v140/SelfCheck.ps1",
       "gitBlobSha": "7fd936d4e5de2cec52e25f1540150691d88c4afb"
     },
     {
       "path": "RunAutoCheckHidden.ps1",
-      "url": "https://raw.githubusercontent.com/antjustdevelops/Domlight-Releases/main/files/v139/RunAutoCheckHidden.ps1",
+      "url": "https://raw.githubusercontent.com/antjustdevelops/Domlight-Releases/main/files/v140/RunAutoCheckHidden.ps1",
       "gitBlobSha": "69178900f9708cbbbcf26b8687b9c4bd6cab4c48"
     },
     {
       "path": "PdfEngine.ps1",
-      "url": "https://raw.githubusercontent.com/antjustdevelops/Domlight-Releases/main/files/v139/PdfEngine.ps1",
+      "url": "https://raw.githubusercontent.com/antjustdevelops/Domlight-Releases/main/files/v140/PdfEngine.ps1",
       "gitBlobSha": "61f83970e5f4a19dc92c8a2fb607f99c07152379"
     },
     {
       "path": "PROJECT_STRUCTURE.md",
-      "url": "https://raw.githubusercontent.com/antjustdevelops/Domlight-Releases/main/files/v139/PROJECT_STRUCTURE.md",
+      "url": "https://raw.githubusercontent.com/antjustdevelops/Domlight-Releases/main/files/v140/PROJECT_STRUCTURE.md",
       "gitBlobSha": "813f309ddcad064773f0e94e075471444e58a6f4"
     },
     {
       "path": "OrganizeDownloadedAccount.ps1",
-      "url": "https://raw.githubusercontent.com/antjustdevelops/Domlight-Releases/main/files/v139/OrganizeDownloadedAccount.ps1",
+      "url": "https://raw.githubusercontent.com/antjustdevelops/Domlight-Releases/main/files/v140/OrganizeDownloadedAccount.ps1",
       "gitBlobSha": "21b465f17fc0632890195d43b2b0081ad65f81be"
     },
     {
       "path": "MeterStatus.ps1",
-      "url": "https://raw.githubusercontent.com/antjustdevelops/Domlight-Releases/main/files/v139/MeterStatus.ps1",
-      "gitBlobSha": "51dd5af9db3f47f20973e4c34606b4523f041ae7"
+      "url": "https://raw.githubusercontent.com/antjustdevelops/Domlight-Releases/main/files/v140/MeterStatus.ps1",
+      "gitBlobSha": "063611850a8b6ba1a96bab3e7cd792179d73b6e1"
+    },
+    {
+      "path": "MeterGridBehavior.ps1",
+      "url": "https://raw.githubusercontent.com/antjustdevelops/Domlight-Releases/main/files/v140/MeterGridBehavior.ps1",
+      "gitBlobSha": "5ef036f27f8a5fb8a040c758ee36a410516edc99"
     },
     {
       "path": "MeterDraftStore.ps1",
-      "url": "https://raw.githubusercontent.com/antjustdevelops/Domlight-Releases/main/files/v139/MeterDraftStore.ps1",
+      "url": "https://raw.githubusercontent.com/antjustdevelops/Domlight-Releases/main/files/v140/MeterDraftStore.ps1",
       "gitBlobSha": "422bd3c38bfc0479d768229267337a5ff08548e5"
     },
     {
+      "path": "UpdateFromGitHub.ps1",
+      "url": "https://raw.githubusercontent.com/antjustdevelops/Domlight-Releases/main/files/v140/UpdateFromGitHub.ps1",
+      "gitBlobSha": "c367650f8ac72de6a1920a677688e2030b8c96a8"
+    },
+    {
       "path": "Mailing.ps1",
-      "url": "https://raw.githubusercontent.com/antjustdevelops/Domlight-Releases/main/files/v139/Mailing.ps1",
+      "url": "https://raw.githubusercontent.com/antjustdevelops/Domlight-Releases/main/files/v140/Mailing.ps1",
       "gitBlobSha": "505adc98b9274d356e7de4098125433d2dedf974"
     },
     {
-      "path": "MENU_DOMLIGHT.ps1",
-      "url": "https://raw.githubusercontent.com/antjustdevelops/Domlight-Releases/main/files/v139/MENU_DOMLIGHT.ps1",
-      "gitBlobSha": "b1b776d660fdb53ae410dac58eb947c63b9f7b64"
-    },
-    {
       "path": "ENABLE_AUTO_CHECK.bat",
-      "url": "https://raw.githubusercontent.com/antjustdevelops/Domlight-Releases/main/files/v139/ENABLE_AUTO_CHECK.bat",
+      "url": "https://raw.githubusercontent.com/antjustdevelops/Domlight-Releases/main/files/v140/ENABLE_AUTO_CHECK.bat",
       "gitBlobSha": "f2758ef04388873745843d11c0f83a699da1fa98"
     },
     {
       "path": "DomlightPortal.ps1",
-      "url": "https://raw.githubusercontent.com/antjustdevelops/Domlight-Releases/main/files/v139/DomlightPortal.ps1",
+      "url": "https://raw.githubusercontent.com/antjustdevelops/Domlight-Releases/main/files/v140/DomlightPortal.ps1",
       "gitBlobSha": "b15d2a027a8db0d4d02a857ebddaef9588a1819e"
     },
     {
       "path": "DomlightLauncher.vbs",
-      "url": "https://raw.githubusercontent.com/antjustdevelops/Domlight-Releases/main/files/v139/DomlightLauncher.vbs",
+      "url": "https://raw.githubusercontent.com/antjustdevelops/Domlight-Releases/main/files/v140/DomlightLauncher.vbs",
       "gitBlobSha": "e3a7fd209d09fa7274dfb7abbdebaf932e0834ee"
     },
     {
       "path": "Domlight.ps1",
-      "url": "https://raw.githubusercontent.com/antjustdevelops/Domlight-Releases/main/files/v139/Domlight.ps1",
+      "url": "https://raw.githubusercontent.com/antjustdevelops/Domlight-Releases/main/files/v140/Domlight.ps1",
       "gitBlobSha": "743b720de1421c229ec616b98d6eb3df114a4c4e"
     },
     {
       "path": "DISABLE_AUTO_CHECK.bat",
-      "url": "https://raw.githubusercontent.com/antjustdevelops/Domlight-Releases/main/files/v139/DISABLE_AUTO_CHECK.bat",
+      "url": "https://raw.githubusercontent.com/antjustdevelops/Domlight-Releases/main/files/v140/DISABLE_AUTO_CHECK.bat",
       "gitBlobSha": "eb6e2ca52d0ff92b505457565940cacca58f98aa"
     },
     {
       "path": "ConnectionSettings.ps1",
-      "url": "https://raw.githubusercontent.com/antjustdevelops/Domlight-Releases/main/files/v139/ConnectionSettings.ps1",
+      "url": "https://raw.githubusercontent.com/antjustdevelops/Domlight-Releases/main/files/v140/ConnectionSettings.ps1",
       "gitBlobSha": "eb649e93e855e15e8c825456696f16959b92ca6e"
     },
     {
       "path": "ConfigureAutoCheckTask.ps1",
-      "url": "https://raw.githubusercontent.com/antjustdevelops/Domlight-Releases/main/files/v139/ConfigureAutoCheckTask.ps1",
+      "url": "https://raw.githubusercontent.com/antjustdevelops/Domlight-Releases/main/files/v140/ConfigureAutoCheckTask.ps1",
       "gitBlobSha": "c817ffd32f1fa9b42c4569328f0eb23b2a77a54d"
     },
     {
       "path": "AutoCheck.ps1",
-      "url": "https://raw.githubusercontent.com/antjustdevelops/Domlight-Releases/main/files/v139/AutoCheck.ps1",
+      "url": "https://raw.githubusercontent.com/antjustdevelops/Domlight-Releases/main/files/v140/AutoCheck.ps1",
       "gitBlobSha": "e40b3aa89bbd8d9d90a7b8e403d5f03f3424c63f"
     },
     {
       "path": "AccountStatus.ps1",
-      "url": "https://raw.githubusercontent.com/antjustdevelops/Domlight-Releases/main/files/v139/AccountStatus.ps1",
+      "url": "https://raw.githubusercontent.com/antjustdevelops/Domlight-Releases/main/files/v140/AccountStatus.ps1",
       "gitBlobSha": "7013dfd669d61603dc161d15692855bd36060422"
     },
     {
-      "path": "UpdateFromGitHub.ps1",
-      "url": "https://raw.githubusercontent.com/antjustdevelops/Domlight-Releases/main/files/v139/UpdateFromGitHub.ps1",
-      "gitBlobSha": "c367650f8ac72de6a1920a677688e2030b8c96a8"
+      "path": "MENU_DOMLIGHT.ps1",
+      "url": "https://raw.githubusercontent.com/antjustdevelops/Domlight-Releases/main/files/v140/MENU_DOMLIGHT.ps1",
+      "gitBlobSha": "b1b776d660fdb53ae410dac58eb947c63b9f7b64"
     },
     {
       "path": "VERSION.txt",
-      "url": "https://raw.githubusercontent.com/antjustdevelops/Domlight-Releases/main/files/v139/VERSION.txt",
-      "gitBlobSha": "228772d699ce4046925520be399be8466c9ebfc6"
+      "url": "https://raw.githubusercontent.com/antjustdevelops/Domlight-Releases/main/files/v140/VERSION.txt",
+      "gitBlobSha": "b1c5e80306a6d26f998fc0aa01498bcf8033011d"
     }
   ]
 }
