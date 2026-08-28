@@ -98,6 +98,7 @@ function Load-ArchiveIntoGrid {
         Set-PrepareButtons $true
     } catch {
         $status.Text='Ошибка чтения архива'
+        if($SmokeTest){throw}
         [Windows.Forms.MessageBox]::Show($_.Exception.Message,'Domlight','OK','Error')|Out-Null
     }
 }
@@ -111,5 +112,13 @@ $btnClose.Add_Click({$form.Close()})
 $form.CancelButton=$btnClose
 $form.Add_Shown({Load-ArchiveIntoGrid})
 
-if($SmokeTest){Write-Output 'SMOKE_OK Mailing';$form.Dispose();exit 0}
+if($SmokeTest){
+    Load-ArchiveIntoGrid
+    $pdfCount=@(Get-ChildItem -LiteralPath $ReceiptsDir -Recurse -Filter *.pdf -File -ErrorAction SilentlyContinue).Count
+    if($script:Rows.Count -ne $pdfCount){throw "Mailing row model mismatch: PDF=$pdfCount rows=$($script:Rows.Count)"}
+    if($grid.Rows.Count -ne $script:Rows.Count){throw "Mailing grid mismatch: model=$($script:Rows.Count) grid=$($grid.Rows.Count)"}
+    Write-Output ('SMOKE_OK Mailing rows='+$grid.Rows.Count)
+    $form.Dispose()
+    exit 0
+}
 [void]$form.ShowDialog()
