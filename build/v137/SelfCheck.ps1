@@ -5,14 +5,13 @@ $required=@(
 'AccountState.ps1','AccountStatus.ps1','AutoCheck.ps1','ConfigureAutoCheckTask.ps1','ConnectionSettings.ps1',
 'DISABLE_AUTO_CHECK.bat','Domlight.ps1','DomlightLauncher.vbs','DomlightPortal.ps1','ENABLE_AUTO_CHECK.bat',
 'Mailing.ps1','MENU_DOMLIGHT.ps1','MeterStatus.ps1','OrganizeDownloadedAccount.ps1','PdfEngine.ps1',
-'RunAutoCheckHidden.ps1','SingleWindowLauncher.ps1','UpdateFromGitHub.ps1','PROJECT_STRUCTURE.md'
+'RunAutoCheckHidden.ps1','SingleWindowLauncher.ps1','UpdateFromGitHub.ps1','PROJECT_STRUCTURE.md','VERSION.txt'
 )
 $errors=New-Object System.Collections.ArrayList
 $warnings=New-Object System.Collections.ArrayList
 
 foreach($name in $required){if(-not(Test-Path -LiteralPath (Join-Path $Root $name))){[void]$errors.Add('Missing required file: '+$name)}}
 
-# Every PowerShell script must be Windows PowerShell 5.1-safe and UTF-8 BOM encoded.
 foreach($f in @(Get-ChildItem -LiteralPath $Root -Filter *.ps1 -File -ErrorAction SilentlyContinue)){
     $bytes=[IO.File]::ReadAllBytes($f.FullName)
     if($bytes.Length -lt 3 -or $bytes[0] -ne 0xEF -or $bytes[1] -ne 0xBB -or $bytes[2] -ne 0xBF){[void]$errors.Add('PowerShell file is not UTF-8 BOM: '+$f.Name)}
@@ -21,7 +20,6 @@ foreach($f in @(Get-ChildItem -LiteralPath $Root -Filter *.ps1 -File -ErrorActio
     foreach($e in @($parseErrors)){[void]$errors.Add("Parser error in $($f.Name) line $($e.Extent.StartLineNumber): $($e.Message)")}
 }
 
-# Resolve local script/batch/vbs dependencies by filename.
 $known=@{}
 foreach($f in @(Get-ChildItem -LiteralPath $Root -File -ErrorAction SilentlyContinue)){$known[$f.Name.ToLowerInvariant()]=$true}
 foreach($f in @(Get-ChildItem -LiteralPath $Root -Filter *.ps1 -File -ErrorAction SilentlyContinue)){
@@ -82,7 +80,7 @@ $meter=Join-Path $Root 'MeterStatus.ps1'
 if(Test-Path -LiteralPath $meter){$t=Get-Content -LiteralPath $meter -Raw -Encoding UTF8;if($t -match '/meter/value'){[void]$errors.Add('Meter submission must remain disabled.')}}
 
 $versionFile=Join-Path $Root 'VERSION.txt'
-if(Test-Path -LiteralPath $versionFile){$v=(Get-Content -LiteralPath $versionFile -Raw -Encoding UTF8).Trim();if([string]::IsNullOrWhiteSpace($v)){[void]$errors.Add('VERSION.txt is empty.')}}else{[void]$warnings.Add('VERSION.txt is not present in source snapshot; updater creates it at install time.')}
+if(Test-Path -LiteralPath $versionFile){$v=(Get-Content -LiteralPath $versionFile -Raw -Encoding UTF8).Trim();if($v -ne 'Domlight v137 RELEASE'){[void]$errors.Add('Unexpected VERSION.txt value: '+$v)}}
 
 $result=[pscustomobject]@{Ok=($errors.Count-eq0);Errors=@($errors|Sort-Object -Unique);Warnings=@($warnings);RequiredCount=$required.Count}
 $result|ConvertTo-Json -Depth 6
