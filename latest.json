@@ -1,7 +1,7 @@
 {
-  "version": "v131 RELEASE",
+  "version": "v132 RELEASE",
   "published": "2026-08-28",
-  "notes": "UI-only refinement on top of the clean v130 updater. Keeps stable Domlight logic and portal behavior unchanged. MeterStatus main window now opens at a height sized to the actual object count, and each object card opens at a height sized to the actual meter-row count, with sensible caps and manual resizing still available. Meter submission remains disabled.",
+  "notes": "Fixes the compact-window sizing crash in MeterStatus under Windows PowerShell 5.1 by using explicit integer arithmetic and scalar dimensions. Main window and object card remain compact by default and resizable. Portal/session/status logic is unchanged; meter submission remains disabled.",
   "files": [
     {
       "path": "UpdateFromGitHub.ps1",
@@ -10,8 +10,8 @@
     },
     {
       "path": "MeterStatus.ps1",
-      "url": "https://raw.githubusercontent.com/antjustdevelops/Domlight-Releases/main/files/v131/MeterStatus.ps1",
-      "gitBlobSha": "3b31fca844cfd5176574101d96c6626caa9ef36e"
+      "url": "https://raw.githubusercontent.com/antjustdevelops/Domlight-Releases/main/files/v132/MeterStatus.ps1",
+      "gitBlobSha": "08682729396dff214f67dae3d8a13a5592382e60"
     }
   ]
 }
