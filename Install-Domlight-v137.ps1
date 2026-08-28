@@ -1,4 +1,4 @@
-param(
+﻿param(
     [string]$TargetRoot = (Join-Path $env:USERPROFILE 'Downloads\Domlight_v137_CLEAN'),
     [string]$SourceDataRoot = (Join-Path $env:USERPROFILE 'Downloads\Domlight_v106_UPDATE_TEST\data')
 )
