@@ -1,0 +1,29 @@
+name: Verify v136 repair
+on:
+  push:
+    branches: [v136-repair]
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: v136-repair
+      - name: Materialize v136 runtime
+        shell: pwsh
+        run: |
+          $ErrorActionPreference='Stop'
+          $dst='verify/v136'
+          New-Item -ItemType Directory -Force -Path $dst|Out-Null
+          Get-ChildItem 'files/v135' -File|ForEach-Object{Copy-Item $_.FullName (Join-Path $dst $_.Name) -Force}
+          Copy-Item 'files/v134/MENU_DOMLIGHT.ps1' (Join-Path $dst 'MENU_DOMLIGHT.ps1') -Force
+          Copy-Item 'files/v136/SelfCheck.ps1' (Join-Path $dst 'SelfCheck.ps1') -Force
+          & (Join-Path $dst 'SelfCheck.ps1') -Root $dst
+          if($LASTEXITCODE-ne 0){throw 'v136 SelfCheck failed'}
+          $menu=Get-Content (Join-Path $dst 'MENU_DOMLIGHT.ps1') -Raw
+          if($menu -match '(?m)^\s*\\\$[A-Za-z_]'){throw 'Invalid menu runtime syntax found'}
+          if($menu -notmatch 'Счётчики / показания'){throw 'Meters menu entry missing'}
+          if($menu -notmatch 'Mailing\.ps1'){throw 'Mailing menu dependency missing'}
+          if($menu -notmatch 'ConnectionSettings\.ps1'){throw 'Connection settings dependency missing'}
