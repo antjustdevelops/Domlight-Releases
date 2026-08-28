@@ -1,11 +1,11 @@
 {
-  "version": "v124 RELEASE",
+  "version": "v125 RELEASE",
   "published": "2026-08-28",
-  "notes": "Fixes Windows PowerShell 5.1 / legacy WinForms compatibility in the new object-first meters UI by removing unsupported TextBox.PlaceholderText and using a normal label plus TextBox. The scalable object -> account meters layout, shortened addresses, month status, draft readings and per-meter selection remain. Meter submission to /meter/value remains disabled.",
+  "notes": "Rebuilds the object-first meters UI in readable Windows PowerShell 5.1 syntax after v124 exposed parser hazards from over-minified code. Removes compact return/operator constructs that PowerShell 5.1 can misparse. Keeps the scalable object -> account meters layout, shortened addresses, search and filters, draft readings, verification data and per-meter selection. Meter submission to /meter/value remains disabled; account switching still uses the proven /account/set flow.",
   "files": [
     {
       "path": "MeterStatus.ps1",
-      "url": "https://raw.githubusercontent.com/antjustdevelops/Domlight-Releases/main/files/v124/MeterStatus.ps1"
+      "url": "https://raw.githubusercontent.com/antjustdevelops/Domlight-Releases/main/files/v125/MeterStatus.ps1"
     }
   ]
 }
