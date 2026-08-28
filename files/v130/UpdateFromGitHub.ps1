@@ -97,10 +97,10 @@ try {
 
     if ($remoteNumber -gt $localNumber) {
         $message = 'New version ' + [string]$manifest.version + ' is available.' + "`r`n" +
-                   'Files to install: ' + $required.Count + "`r`n`r`nInstall now?'
+                   'Files to install: ' + $required.Count + "`r`n`r`n" + 'Install now?'
     }
     else {
-        $message = 'Version number already matches, but ' + $required.Count + ' managed file(s) differ.' + "`r`n`r`nRepair now?"
+        $message = 'Version number already matches, but ' + $required.Count + ' managed file(s) differ.' + "`r`n`r`n" + 'Repair now?'
     }
 
     $answer = [Windows.Forms.MessageBox]::Show($message, 'Domlight Update', 'YesNo', 'Question')
