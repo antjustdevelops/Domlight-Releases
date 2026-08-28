@@ -1,7 +1,7 @@
 {
     "version":  "v137 RELEASE",
     "published":  "2026-08-29",
-    "notes":  "Full structural baseline: complete managed snapshot; every PowerShell file normalized to UTF-8 BOM and parsed by Windows PowerShell 5.1; cabinet, proxy settings and mailing UI smoke-tested; child startup failures are visible and logged; mailing grid uses explicit rows; data is preserved; meter submission remains disabled.",
+    "notes":  "Full structural baseline: complete managed snapshot; every PowerShell file normalized to UTF-8 BOM and parsed by Windows PowerShell 5.1; menu child path smoke-tested through SingleWindowLauncher for cabinet, proxy settings and mailing; child startup failures are visible and logged; mailing grid uses explicit rows; data is preserved; meter submission remains disabled.",
     "files":  [
                   {
                       "path":  "AccountState.ps1",
