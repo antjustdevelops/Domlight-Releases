@@ -26,7 +26,7 @@ jobs:
 
           foreach($f in @($manifest.files)){
             $needle='/antjustdevelops/Domlight-Releases/main/'
-            $idx=[string]$f.url.IndexOf($needle)
+            $idx=([string]$f.url).IndexOf($needle)
             if($idx -lt 0){throw "Unsupported manifest URL: $($f.url)"}
             $repoPath=([string]$f.url).Substring($idx+$needle.Length).Replace('/','\')
             if(-not(Test-Path -LiteralPath $repoPath)){throw "Manifest source missing: $repoPath"}
@@ -37,48 +37,47 @@ jobs:
             Copy-Item -LiteralPath (Join-Path 'build\v137' $name) -Destination (Join-Path $out $name) -Force
           }
 
-          # Cabinet: add smoke-test entry point and remove the blocking pre-show portal request.
           $domPath=Join-Path $out 'Domlight.ps1'
           $dom=[IO.File]::ReadAllText($domPath,[Text.Encoding]::UTF8)
           $dom=$dom.TrimStart([char]0xFEFF,"`r","`n")
           if($dom -notmatch '^param\(\[switch\]\$SmokeTest\)'){$dom="param([switch]`$SmokeTest)`r`n`r`n"+$dom}
           $startupPattern='(?s)\r?\ntry \{\r?\n    Add-Type -AssemblyName System\.Web.*?\r?\nRefresh-LastCheck\r?\n\[void\]\$form\.ShowDialog\(\)\s*$'
-          $startupReplacement=@'
-
-if ($SmokeTest) {
-    Write-Output 'SMOKE_OK Domlight'
-    $form.Dispose()
-    exit 0
-}
-
-# Startup intentionally avoids a portal request before the window is visible.
-# A saved session enables manual sync; portal validity is checked when an action uses it.
-try {
-    Add-Type -AssemblyName System.Web
-    Load-Session
-    if (Test-Path -LiteralPath $SessionFile) {
-        $lblStatus.Text = "Сессия сохранена"
-        $lblStatus.ForeColor = [Drawing.Color]::DarkOrange
-        $btnSync.Enabled = $true
-        Log "Сохранённая сессия загружена. Проверка соединения будет выполнена при обращении к порталу."
-    } else {
-        Log "Введите телефон и получите SMS."
-    }
-} catch {
-    Log "Старт: $($_.Exception.Message)"
-}
-
-Refresh-LastCheck
-[void]$form.ShowDialog()
-'@
+          $startupLines=@(
+            '',
+            'if ($SmokeTest) {',
+            "    Write-Output 'SMOKE_OK Domlight'",
+            '    $form.Dispose()',
+            '    exit 0',
+            '}',
+            '',
+            '# Startup intentionally avoids a portal request before the window is visible.',
+            '# A saved session enables manual sync; portal validity is checked when an action uses it.',
+            'try {',
+            '    Add-Type -AssemblyName System.Web',
+            '    Load-Session',
+            '    if (Test-Path -LiteralPath $SessionFile) {',
+            '        $lblStatus.Text = "Сессия сохранена"',
+            '        $lblStatus.ForeColor = [Drawing.Color]::DarkOrange',
+            '        $btnSync.Enabled = $true',
+            '        Log "Сохранённая сессия загружена. Проверка соединения будет выполнена при обращении к порталу."',
+            '    } else {',
+            '        Log "Введите телефон и получите SMS."',
+            '    }',
+            '} catch {',
+            '    Log "Старт: $($_.Exception.Message)"',
+            '}',
+            '',
+            'Refresh-LastCheck',
+            '[void]$form.ShowDialog()'
+          )
+          $startupReplacement=$startupLines -join "`r`n"
           $rx=New-Object Text.RegularExpressions.Regex($startupPattern,[Text.RegularExpressions.RegexOptions]::None)
           if(-not $rx.IsMatch($dom)){throw 'Domlight startup block was not found; refusing an unsafe build.'}
-          $dom=$rx.Replace($dom,$startupReplacement,1)
+          $dom=$rx.Replace($dom,[Text.RegularExpressions.MatchEvaluator]{param($m)$startupReplacement},1)
           [IO.File]::WriteAllText($domPath,$dom,(New-Object Text.UTF8Encoding($true)))
 
           Set-Content -LiteralPath (Join-Path $out 'VERSION.txt') -Value 'Domlight v137 RELEASE' -Encoding UTF8
 
-          # Normalize every PowerShell file for Windows PowerShell 5.1: UTF-8 with BOM.
           $bom=New-Object Text.UTF8Encoding($true)
           foreach($p in @(Get-ChildItem -LiteralPath $out -Filter *.ps1 -File)){
             $text=[IO.File]::ReadAllText($p.FullName,[Text.Encoding]::UTF8)
