@@ -1,11 +1,17 @@
 {
-  "version": "v128 RELEASE",
+  "version": "v129 RELEASE",
   "published": "2026-08-28",
-  "notes": "UI-only refinement of the verified object-first meters screen. Keeps the same portal/session/account-switching logic, month-status calculation and meter data as v127. Both the main object table and per-object meter table now use the standard Domlight responsive layout: columns fill the available width, addresses remain wide, vertical scrolling is used, windows are resizable/maximizable, and no large unused horizontal area remains. Meter submission is still disabled; no /meter/value request exists.",
+  "notes": "Structural updater release. Adds file-level verification with Git blob hashes, repair of mismatched files even when the version number already matches, staged downloads, backup before replacement, verification after installation and rollback on failure. Includes the verified responsive MeterStatus UI from v128. Meter submission remains disabled.",
   "files": [
     {
+      "path": "UpdateFromGitHub.ps1",
+      "url": "https://raw.githubusercontent.com/antjustdevelops/Domlight-Releases/main/files/v129/UpdateFromGitHub.ps1",
+      "gitBlobSha": "bf435a949d64e7dd45570824e9d7eff716eddb17"
+    },
+    {
       "path": "MeterStatus.ps1",
-      "url": "https://raw.githubusercontent.com/antjustdevelops/Domlight-Releases/main/files/v128/MeterStatus.ps1"
+      "url": "https://raw.githubusercontent.com/antjustdevelops/Domlight-Releases/main/files/v129/MeterStatus.ps1",
+      "gitBlobSha": "78793c1265b30877aea4d778bf0f0f7957c839bd"
     }
   ]
 }
