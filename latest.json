@@ -1,11 +1,11 @@
 {
-  "version": "v121 RELEASE",
+  "version": "v122 RELEASE",
   "published": "2026-08-28",
-  "notes": "Audited read-only meters window. Session loading and account switching now follow the same proven flow as the stable Domlight client and AutoCheck module. Meter parsing is hardened to keep type, number, value, date and verification data within each individual meter card. Meter reading submission remains disabled. The window still uses the normal service POST /account/set only to switch accounts, exactly as the stable receipt checker does. Local data, receipts and settings are preserved.",
+  "notes": "Updates the audited meters window to use the current-month transmission model: 'Current' becomes 'Last reading'; the old previous-period column is removed; a calculated current-month status (Sent / Not sent) is added based on the portal's 'Передавали' date; an editable 'Новое показание' field is available only when the current month is not yet sent; verification information remains visible. Meter reading submission to /meter/value is still disabled. The only POST used is the proven /account/set service call for switching accounts.",
   "files": [
     {
       "path": "MeterStatus.ps1",
-      "url": "https://raw.githubusercontent.com/antjustdevelops/Domlight-Releases/main/files/v121/MeterStatus.ps1"
+      "url": "https://raw.githubusercontent.com/antjustdevelops/Domlight-Releases/main/files/v122/MeterStatus.ps1"
     }
   ]
 }
