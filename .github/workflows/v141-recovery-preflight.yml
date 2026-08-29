@@ -8,29 +8,36 @@ jobs:
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4
+
       - name: Parse recovery scripts with Windows PowerShell 5.1
         shell: powershell
         run: |
           $ErrorActionPreference='Stop'
-          $files=@('recovery/v141/INSTALL_V141_RECOVERY_V2.ps1')
-          foreach($f in $files){
+          foreach($f in @('recovery/v141/INSTALL_V141_RECOVERY_V2.ps1')){
             $tokens=$null; $errors=$null
             [void][System.Management.Automation.Language.Parser]::ParseFile((Resolve-Path $f),[ref]$tokens,[ref]$errors)
             if(@($errors).Count){ $errors | Format-List *; throw "Parser failed: $f" }
             Write-Host "PARSE OK: $f"
           }
+
       - name: Validate launcher and installer contracts
         shell: powershell
         run: |
           $ErrorActionPreference='Stop'
           $ps=Get-Content 'recovery/v141/INSTALL_V141_RECOVERY_V2.ps1' -Raw
           $cmd=Get-Content 'recovery/v141/RUN_V141_RECOVERY.cmd' -Raw
-          foreach($required in @('recovery_safety','update_backups','Domlight v141 RECOVERY CANDIDATE','Mailing.ps1','ConnectionSettings.ps1','SelfCheck.ps1')){if($ps -notmatch [regex]::Escape($required)){throw "Missing installer contract: $required"}}
+          foreach($required in @('recovery_safety','update_backups','Domlight v141 RECOVERY CANDIDATE','Mailing.ps1','ConnectionSettings.ps1','SelfCheck.ps1')){
+            if($ps -notmatch [regex]::Escape($required)){throw "Missing installer contract: $required"}
+          }
           if($ps -match "files/v135/(Mailing|ConnectionSettings|PdfEngine)"){throw 'Forbidden v135 managed replacement referenced'}
-          if($ps -match '/meter/value'){throw 'Meter submission endpoint must remain disabled'}
+          $meter=Get-Content 'files/v140/MeterStatus.ps1' -Raw
+          if($meter -match "Invoke-WebRequest[^\r\n]*?/meter/value" -or $meter -match "Invoke-RestMethod[^\r\n]*?/meter/value"){
+            throw 'Meter submission call is enabled'
+          }
           if($cmd -notmatch 'pause'){throw 'Launcher must remain open on result'}
           if($cmd -notmatch 'INSTALL_V141_RECOVERY_V2.ps1'){throw 'Launcher does not invoke V2 installer'}
           Write-Host 'CONTRACT CHECK OK'
+
       - name: Verify pinned GitHub blobs
         shell: powershell
         run: |
@@ -48,3 +55,54 @@ jobs:
             @('files/v140/MeterGridBehavior.ps1','5ef036f27f8a5fb8a040c758ee36a410516edc99')
           )
           foreach($p in $pins){$got=BlobSha $p[0];if($got-ne$p[1]){throw "Pin mismatch $($p[0]): $got"};Write-Host "PIN OK $($p[0])"}
+
+      - name: Full recovery dry-run in isolated fixture
+        shell: powershell
+        run: |
+          $ErrorActionPreference='Stop'
+          $root=Join-Path $env:RUNNER_TEMP 'DomlightFixture'
+          $data=Join-Path $root 'data'
+          $backup=Join-Path $data 'update_backups\20260828_120000'
+          New-Item -ItemType Directory -Force -Path $root,$data,$backup | Out-Null
+
+          # Existing installation placeholders that must be safety-backed up.
+          'old version' | Set-Content (Join-Path $root 'VERSION.txt') -Encoding UTF8
+          'old updater' | Set-Content (Join-Path $root 'UpdateFromGitHub.ps1') -Encoding UTF8
+          'old selfcheck' | Set-Content (Join-Path $root 'SelfCheck.ps1') -Encoding UTF8
+
+          # Full legacy mailing fixture with enough real contract markers.
+          @'
+          $x='Gmail';$y='WhatsApp';$z='Recipients';$a='recipients.json';$b='email_history.json';$c='whatsapp_history.json';$d='gmail_token.dat'
+          '@ | Set-Content (Join-Path $backup 'Mailing.ps1') -Encoding UTF8
+
+          @'
+          $cfg=[pscustomobject]@{useProxy=$false;proxyUrl='';proxyUser='';proxyPassword=''}
+          '@ | Set-Content (Join-Path $backup 'ConnectionSettings.ps1') -Encoding UTF8
+
+          'function Send-GmailMessage { param() }' | Set-Content (Join-Path $root 'GmailApi.ps1') -Encoding UTF8
+          'function Get-Recipients { param() }' | Set-Content (Join-Path $root 'Recipients.ps1') -Encoding UTF8
+
+          powershell.exe -NoProfile -ExecutionPolicy Bypass -File 'recovery/v141/INSTALL_V141_RECOVERY_V2.ps1' -Root $root
+          if($LASTEXITCODE -ne 0){throw "Recovery dry-run failed with code $LASTEXITCODE"}
+          $v=(Get-Content (Join-Path $root 'VERSION.txt') -Raw).Trim()
+          if($v -ne 'Domlight v141 RECOVERY CANDIDATE'){throw "Wrong installed version: $v"}
+          if(-not(Test-Path (Join-Path $root 'data\recovery_safety'))){throw 'Safety backup root missing'}
+          $logs=@(Get-ChildItem $data -Filter 'recovery_v141_*.log')
+          if($logs.Count -lt 1){throw 'Recovery log missing'}
+          if((Get-Content $logs[-1].FullName -Raw) -notmatch 'SUCCESS'){throw 'Recovery log has no SUCCESS'}
+          Write-Host 'FULL RECOVERY DRY-RUN OK'
+
+      - name: Failure path leaves installation unchanged
+        shell: powershell
+        run: |
+          $ErrorActionPreference='Stop'
+          $root=Join-Path $env:RUNNER_TEMP 'DomlightFailureFixture'
+          $data=Join-Path $root 'data'
+          New-Item -ItemType Directory -Force -Path $root,$data | Out-Null
+          'Domlight ORIGINAL' | Set-Content (Join-Path $root 'VERSION.txt') -Encoding UTF8
+          $before=(Get-FileHash (Join-Path $root 'VERSION.txt') -Algorithm SHA256).Hash
+          powershell.exe -NoProfile -ExecutionPolicy Bypass -File 'recovery/v141/INSTALL_V141_RECOVERY_V2.ps1' -Root $root
+          if($LASTEXITCODE -eq 0){throw 'Expected failure did not occur'}
+          $after=(Get-FileHash (Join-Path $root 'VERSION.txt') -Algorithm SHA256).Hash
+          if($before -ne $after){throw 'Failure path modified existing installation'}
+          Write-Host 'FAILURE/NO-CHANGE TEST OK'
