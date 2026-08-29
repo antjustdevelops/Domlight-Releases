@@ -1,0 +1,50 @@
+name: v141-recovery-preflight
+on:
+  push:
+    branches: [v141-recovery-candidate]
+  workflow_dispatch:
+jobs:
+  powershell51:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Parse recovery scripts with Windows PowerShell 5.1
+        shell: powershell
+        run: |
+          $ErrorActionPreference='Stop'
+          $files=@('recovery/v141/INSTALL_V141_RECOVERY_V2.ps1')
+          foreach($f in $files){
+            $tokens=$null; $errors=$null
+            [void][System.Management.Automation.Language.Parser]::ParseFile((Resolve-Path $f),[ref]$tokens,[ref]$errors)
+            if(@($errors).Count){ $errors | Format-List *; throw "Parser failed: $f" }
+            Write-Host "PARSE OK: $f"
+          }
+      - name: Validate launcher and installer contracts
+        shell: powershell
+        run: |
+          $ErrorActionPreference='Stop'
+          $ps=Get-Content 'recovery/v141/INSTALL_V141_RECOVERY_V2.ps1' -Raw
+          $cmd=Get-Content 'recovery/v141/RUN_V141_RECOVERY.cmd' -Raw
+          foreach($required in @('recovery_safety','update_backups','Domlight v141 RECOVERY CANDIDATE','Mailing.ps1','ConnectionSettings.ps1','SelfCheck.ps1')){if($ps -notmatch [regex]::Escape($required)){throw "Missing installer contract: $required"}}
+          if($ps -match "files/v135/(Mailing|ConnectionSettings|PdfEngine)"){throw 'Forbidden v135 managed replacement referenced'}
+          if($ps -match '/meter/value'){throw 'Meter submission endpoint must remain disabled'}
+          if($cmd -notmatch 'pause'){throw 'Launcher must remain open on result'}
+          if($cmd -notmatch 'INSTALL_V141_RECOVERY_V2.ps1'){throw 'Launcher does not invoke V2 installer'}
+          Write-Host 'CONTRACT CHECK OK'
+      - name: Verify pinned GitHub blobs
+        shell: powershell
+        run: |
+          $ErrorActionPreference='Stop'
+          function BlobSha($p){$b=[IO.File]::ReadAllBytes($p);$h=[Text.Encoding]::ASCII.GetBytes(('blob '+$b.Length+[char]0));$a=New-Object byte[]($h.Length+$b.Length);[Buffer]::BlockCopy($h,0,$a,0,$h.Length);[Buffer]::BlockCopy($b,0,$a,$h.Length,$b.Length);$s=[Security.Cryptography.SHA1]::Create();try{(($s.ComputeHash($a)|%{$_.ToString('x2')})-join'')}finally{$s.Dispose()}}
+          $pins=@(
+            @('files/v106/AccountState.ps1','0521a6bf852a201df5cf0986650939a52fa34c61'),
+            @('files/v109/AccountStatus.ps1','7013dfd669d61603dc161d15692855bd36060422'),
+            @('files/v109/OrganizeDownloadedAccount.ps1','21b465f17fc0632890195d43b2b0081ad65f81be'),
+            @('files/v106/Domlight.ps1','8745cf88f53f0745b388e8f13783fb771c99c642'),
+            @('files/v106/AutoCheck.ps1','3d059b62d4df75d4ca00a634309dfe4c1ac28ade'),
+            @('files/v140/RunAutoCheckHidden.ps1','69178900f9708cbbbcf26b8687b9c4bd6cab4c48'),
+            @('files/v140/MeterStatus.ps1','063611850a8b6ba1a96bab3e7cd792179d73b6e1'),
+            @('files/v140/MeterDraftStore.ps1','422bd3c38bfc0479d768229267337a5ff08548e5'),
+            @('files/v140/MeterGridBehavior.ps1','5ef036f27f8a5fb8a040c758ee36a410516edc99')
+          )
+          foreach($p in $pins){$got=BlobSha $p[0];if($got-ne$p[1]){throw "Pin mismatch $($p[0]): $got"};Write-Host "PIN OK $($p[0])"}
