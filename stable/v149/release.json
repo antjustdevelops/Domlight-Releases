@@ -1,0 +1,30 @@
+{
+  "version": "v149 STABLE",
+  "published": "2026-08-30",
+  "notes": "Accepted Domlight v149 stable baseline. Receipt, mailing, proxy and account-state modules are preserved; AccountStatus is single-instance; meter New Value stays editable and Transfer is enabled only for a valid value.",
+  "files": [
+    {"path":"AccountState.ps1","gitBlobSha":"0521a6bf852a201df5cf0986650939a52fa34c61"},
+    {"path":"AccountStatus.ps1","gitBlobSha":"93283fc815543e3237d28bef06a39e3b19329440"},
+    {"path":"AutoCheck.ps1","gitBlobSha":"e40b3aa89bbd8d9d90a7b8e403d5f03f3424c63f"},
+    {"path":"ConfigureAutoCheckTask.ps1","gitBlobSha":"c817ffd32f1fa9b42c4569328f0eb23b2a77a54d"},
+    {"path":"ConnectionSettings.ps1","gitBlobSha":"eb649e93e855e15e8c825456696f16959b92ca6e"},
+    {"path":"DISABLE_AUTO_CHECK.bat","gitBlobSha":"eb6e2ca52d0ff92b505457565940cacca58f98aa"},
+    {"path":"Domlight.ps1","gitBlobSha":"743b720de1421c229ec616b98d6eb3df114a4c4e"},
+    {"path":"DomlightLauncher.vbs","gitBlobSha":"e3a7fd209d09fa7274dfb7abbdebaf932e0834ee"},
+    {"path":"DomlightPortal.ps1","gitBlobSha":"b15d2a027a8db0d4d02a857ebddaef9588a1819e"},
+    {"path":"ENABLE_AUTO_CHECK.bat","gitBlobSha":"f2758ef04388873745843d11c0f83a699da1fa98"},
+    {"path":"MENU_DOMLIGHT.ps1","gitBlobSha":"b1b776d660fdb53ae410dac58eb947c63b9f7b64"},
+    {"path":"Mailing.ps1","gitBlobSha":"505adc98b9274d356e7de4098125433d2dedf974"},
+    {"path":"MeterDraftStore.ps1","gitBlobSha":"422bd3c38bfc0479d768229267337a5ff08548e5"},
+    {"path":"MeterGridBehavior.ps1","gitBlobSha":"592481dd87b5242c9f125548d757347920058aae"},
+    {"path":"MeterStatus.ps1","gitBlobSha":"af9383b1d7a8e58f2e1ba47abeda33e92cdea46e"},
+    {"path":"OrganizeDownloadedAccount.ps1","gitBlobSha":"21b465f17fc0632890195d43b2b0081ad65f81be"},
+    {"path":"PROJECT_STRUCTURE.md","gitBlobSha":"813f309ddcad064773f0e94e075471444e58a6f4"},
+    {"path":"PdfEngine.ps1","gitBlobSha":"61f83970e5f4a19dc92c8a2fb607f99c07152379"},
+    {"path":"RunAutoCheckHidden.ps1","gitBlobSha":"69178900f9708cbbbcf26b8687b9c4bd6cab4c48"},
+    {"path":"SelfCheck.ps1","gitBlobSha":"7fd936d4e5de2cec52e25f1540150691d88c4afb"},
+    {"path":"SingleWindowLauncher.ps1","gitBlobSha":"2b28b54b985e4d9aaa00c8f9666a0d516e9f2a5d"},
+    {"path":"UpdateFromGitHub.ps1","gitBlobSha":"c367650f8ac72de6a1920a677688e2030b8c96a8"},
+    {"path":"VERSION.txt","gitBlobSha":"6ad43f312faf01322e811483e4df5952048892cb"}
+  ]
+}
