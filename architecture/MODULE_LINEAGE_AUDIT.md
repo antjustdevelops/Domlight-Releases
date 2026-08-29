@@ -76,12 +76,58 @@ For the account-status block, do NOT mix arbitrary latest files. The current pro
 - lifecycle semantics = v105 user-tested / v106 released contract.
 - menu/window launch behavior may use v110 SingleWindowLauncher only as a wrapper; it must not alter lifecycle/UI behavior.
 
-AutoCheck and Domlight must be audited as dependencies before a recovery package is labelled stable, because both read/write account state and later versions may contain targeted unrelated fixes. They cannot be replaced merely because their version number is newer.
+## Domlight / AutoCheck dependency audit
 
-### Discipline failure pattern
-The defect here is the same architectural pattern as Mailing: later full-baseline/canonical builds could combine files from different historical stages without proving that the combination had been accepted together. A green parser/smoke test cannot prove the account lifecycle, UI, address enrichment and AutoCheck integration remain behaviorally compatible.
+### v106 is the last directly user-validated integration baseline
+v106 Domlight.ps1 blob SHA: 8745cf88f53f0745b388e8f13783fb771c99c642.
+v106 AutoCheck.ps1 blob SHA: 3d059b62d4df75d4ca00a634309dfe4c1ac28ade.
+These files implement the same connection.json contract and the same proxy helper shape: useProxy, proxyUrl, proxyUser, proxyPassword; both apply Proxy, ProxyUseDefaultCredentials=false and optional ProxyCredential to Invoke-WebRequest.
 
-Therefore the account-status block is treated as a protected composite module with pinned compatible implementations and a behavioral regression contract, not as independent latest-file selection.
+### Later v134 files are not byte-identical
+v134 Domlight.ps1 blob SHA: 9aa5312dc7f073798cbf3b2873ce7b0dd9cf2d05.
+v134 AutoCheck.ps1 blob SHA: 14dbdae4a435351862477ce653ab0b21e2b19d91.
+The proxy helper itself remains structurally the same, but authentication detection and other portal behavior changed. For example, Is-Authenticated changed from a receipt/account-form heuristic in v106 to Parse-Accounts based detection in v134. Therefore v134 Domlight/AutoCheck cannot be treated as automatically accepted just because proxy code looks unchanged.
+
+Recovery rule:
+- v106 Domlight/AutoCheck remain the accepted behavioral baseline.
+- later changes must be cherry-picked only when their purpose and regression impact are known.
+- do not replace both with v134/v140 simply because they are newer.
+
+## Proxy / connection lineage
+
+The proxy block is also a composite protected module:
+- ConnectionSettings.ps1 — edits connection.json.
+- connection.json — local user state and contract.
+- Get-ProxyArgs in Domlight.ps1.
+- Get-ProxyArgs in AutoCheck.ps1.
+- proxy handling in MeterStatus.ps1 and any future portal module.
+- menu integration that opens ConnectionSettings.ps1.
+
+### Proven contract
+The accepted v106 network consumers use exactly these fields in data/connection.json:
+- useProxy : bool
+- proxyUrl : string
+- proxyUser : string
+- proxyPassword : string
+
+No release may silently rename, encrypt differently, move or reinterpret these fields without migrating every consumer and passing full regression.
+
+### ConnectionSettings was locally protected before v135
+v106 does not ship ConnectionSettings.ps1 as a managed release file. v134 PROJECT_STRUCTURE.md explicitly lists ConnectionSettings.ps1 together with Mailing.ps1 as a local optional module that must be preserved and may become managed only after the deployed local copy is captured and audited.
+
+### Second confirmed v135 discipline violation
+v135 suddenly includes a managed ConnectionSettings.ps1 (blob SHA f728a3bd57a0e4c65555acc457ebf5defafb6ba3) despite v134's explicit capture-and-audit requirement. This is the same violation pattern as Mailing.
+
+Therefore:
+- v135+ ConnectionSettings.ps1 is NOT automatically the accepted proxy UI implementation.
+- the last accepted proxy UI is the locally carried-forward pre-v135 ConnectionSettings used with the v106-v110 working installation.
+- the data contract remains pinned to the v106 consumers until that local implementation is recovered/audited.
+
+### Current v140 state
+v140 ConnectionSettings.ps1 (blob SHA eb649e93e855e15e8c825456696f16959b92ca6e) still writes the same four fields and validates http/https URLs, so it is contract-compatible at a superficial data-shape level. However, it remains CANDIDATE because it is a rewritten managed implementation descended from the unaccepted v135 takeover, not the proven local implementation.
+
+### Proxy recovery rule
+For recovery, preserve data/connection.json unchanged. Do not rewrite credentials or change schema. Prefer the pre-v135 local ConnectionSettings implementation if recoverable. If not recoverable, v140 ConnectionSettings may only be used as a candidate UI after verifying it round-trips the existing connection.json and Domlight/AutoCheck/MeterStatus all successfully connect through both proxy-on and proxy-off modes.
 
 ## Other module lineage
 
@@ -108,5 +154,7 @@ Any candidate that changes a protected module outside CHANGE_TARGET, replaces a 
 Build the next recovery candidate by:
 1. preserving the useful meter implementation separately as CANDIDATE;
 2. restoring the complete working mailing behavior from the verified pre-v135 lineage;
-3. pinning the account-status composite block to AccountState v106 + AccountStatus v109 + OrganizeDownloadedAccount v109, then auditing AutoCheck/Domlight dependencies;
-4. not modifying other protected modules as part of this recovery.
+3. pinning the account-status composite block to AccountState v106 + AccountStatus v109 + OrganizeDownloadedAccount v109;
+4. keeping Domlight/AutoCheck behavior pinned to v106 unless a later targeted fix is proven safe;
+5. preserving the v106 connection.json proxy contract and recovering/auditing the pre-v135 ConnectionSettings implementation;
+6. not modifying other protected modules as part of this recovery.
