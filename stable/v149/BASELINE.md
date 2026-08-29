@@ -22,7 +22,7 @@ Future features must be developed on a DEV/TEST branch and must not replace unre
 
 Canonical user-side recovery artifact: `SETUP_DOMLIGHT_v149_STABLE.cmd`.
 
-SHA-256: `37d08dca87f1049bac2e57978c04fa1d2d74ca5c0bd585f3e812566183392b92`
+SHA-256: `022c5fec4b41a6c56dce51ad236ef7b01022d3d179808bc72bf74537be41f124`
 
 The installer preserves `Documents\\Domlight\\data`, creates a pre-install safety backup of program files, installs the accepted baseline, retrieves the three pinned meter modules from `main/files/v140`, applies the accepted meter checkbox rule, validates PowerShell syntax, and creates a desktop shortcut.
 
