@@ -33,16 +33,60 @@ Therefore:
 - v140 as a whole is NOT a stable baseline.
 - the effective last accepted application state for the mailing block is the locally carried-forward working stack present at v110 (and preserved through v134), whose implementation lineage originates in the final 2026-08-21 package.
 
+## Account lifecycle / status lineage
+
+This is a composite protected block, not a single file. It consists of at least:
+- AccountState.ps1 — lifecycle state and transitions.
+- AccountStatus.ps1 — status UI and manual actions.
+- OrganizeDownloadedAccount.ps1 — address/apartment enrichment used by the status UI.
+- AutoCheck.ps1 / Domlight.ps1 — producers/consumers of accounts_state.json.
+- MENU_DOMLIGHT.ps1 / SingleWindowLauncher.ps1 — launch integration only; must not change business semantics.
+
+### Accepted lifecycle core
+The v105 test sequence established the accepted semantics and v106 formalized them. AccountState.ps1 in v106 has blob SHA 0521a6bf852a201df5cf0986650939a52fa34c61.
+
+Important evidence: v134 AccountState.ps1 has the exact same blob SHA 0521a6bf852a201df5cf0986650939a52fa34c61. Therefore the accepted lifecycle core from v106 survived unchanged through v134.
+
+Protected semantics:
+- current successful portal snapshot is authoritative for presence, but disappearance never deletes local account history;
+- 1-2 successful misses => missing;
+- 3rd successful miss => inactive;
+- portal/parse/auth failure does not increment the miss counter;
+- return on a successful snapshot => active immediately and miss counter resets;
+- manual Excluded is independent from temporary missing/inactive and only changes by explicit user action;
+- restoring an excluded account makes it eligible for checks again;
+- local archive/state survives disappearance.
+
+### AccountStatus UI repair sequence
+v106 AccountStatus.ps1 blob SHA: bd721bb0138d6f2e4dbc1f3a3ed8bbc79aae0f1e.
+
+v107/v108 were compatibility repairs for Windows PowerShell 5.1. v108 AccountStatus.ps1 blob SHA: 48948eb422e46456b8fe22083b0ef442319fc9d3e.
+
+v109 then repaired address display/integration. v109 AccountStatus.ps1 blob SHA: 7013dfd669d61603dc161d15692855bd36060422.
+
+Important evidence: v134 AccountStatus.ps1 has the exact same blob SHA 7013dfd669d61603dc161d15692855bd36060422. Therefore the v109 AccountStatus implementation is the last clearly traceable repaired UI carried unchanged into the v134 structural baseline.
+
+v109 also shipped OrganizeDownloadedAccount.ps1 blob SHA 21b465f17fc0632890195d43b2b0081ad65f81be, and v134 carries the same blob SHA. The address/apartment enrichment pair is therefore consistent: AccountStatus v109 + OrganizeDownloadedAccount v109, both unchanged in v134.
+
+### Correct protected combination for recovery
+For the account-status block, do NOT mix arbitrary latest files. The current protected recovery combination is:
+- AccountState.ps1 = v106 implementation (unchanged through v134).
+- AccountStatus.ps1 = v109 repaired implementation (unchanged through v134).
+- OrganizeDownloadedAccount.ps1 = v109 implementation (unchanged through v134).
+- lifecycle semantics = v105 user-tested / v106 released contract.
+- menu/window launch behavior may use v110 SingleWindowLauncher only as a wrapper; it must not alter lifecycle/UI behavior.
+
+AutoCheck and Domlight must be audited as dependencies before a recovery package is labelled stable, because both read/write account state and later versions may contain targeted unrelated fixes. They cannot be replaced merely because their version number is newer.
+
+### Discipline failure pattern
+The defect here is the same architectural pattern as Mailing: later full-baseline/canonical builds could combine files from different historical stages without proving that the combination had been accepted together. A green parser/smoke test cannot prove the account lifecycle, UI, address enrichment and AutoCheck integration remain behaviorally compatible.
+
+Therefore the account-status block is treated as a protected composite module with pinned compatible implementations and a behavioral regression contract, not as independent latest-file selection.
+
 ## Other module lineage
 
 ### Receipt portal/download/archive
 Protected lineage: v96 working baseline -> v104 frozen baseline -> v105 tested integration -> v106 release. Later changes must be treated as targeted fixes only unless explicitly accepted.
-
-### Account lifecycle
-Accepted from v105 test sequence and formalized in v106: active -> missing after successful absence checks -> inactive after third successful miss -> active immediately on return; manual exclusion/restoration; local history preserved.
-
-### AccountStatus UI
-v106 behavior accepted conceptually; v107-v109 fixed PowerShell 5.1 encoding/address UI regression. Later work may use these fixes but may not change lifecycle semantics.
 
 ### Window/menu launcher
 v110 targeted SingleWindowLauncher/menu work is a later accepted structural improvement candidate. It must not change business behavior of child modules.
@@ -53,12 +97,16 @@ Meter work was initially correctly isolated. v140 meter UI/draft behavior is use
 ## Mandatory release gate
 Every candidate release must declare:
 1. CHANGE_TARGET: exact module(s) intentionally changed.
-2. PROTECTED_MODULES: all previously accepted modules.
+2. PROTECTED_MODULES: all previously accepted modules, including composite module pin sets.
 3. DEPENDENCY_IMPACT: shared dependencies touched by the change.
 4. REGRESSION_CONTRACT: executable/smoke/manual checks for every affected protected module.
 5. USER_ACCEPTED: false until explicit user confirmation after real Windows test.
 
-Any candidate that changes a protected module outside CHANGE_TARGET, replaces a protected implementation without lineage evidence, or has USER_ACCEPTED=false must not be labelled STABLE.
+Any candidate that changes a protected module outside CHANGE_TARGET, replaces a protected implementation without lineage evidence, mixes incompatible versions of a composite module, or has USER_ACCEPTED=false must not be labelled STABLE.
 
 ## Current recovery direction
-Build the next recovery candidate by preserving the current useful meter implementation separately while restoring the complete working mailing behavior (Mailing + Recipients + GmailApi + recipient/history data contracts) from the verified pre-v135 lineage. Do not modify other protected modules as part of that recovery.
+Build the next recovery candidate by:
+1. preserving the useful meter implementation separately as CANDIDATE;
+2. restoring the complete working mailing behavior from the verified pre-v135 lineage;
+3. pinning the account-status composite block to AccountState v106 + AccountStatus v109 + OrganizeDownloadedAccount v109, then auditing AutoCheck/Domlight dependencies;
+4. not modifying other protected modules as part of this recovery.
