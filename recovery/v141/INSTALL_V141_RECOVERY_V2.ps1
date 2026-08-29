@@ -16,8 +16,8 @@ function FindCurrentOrBackup([string]$name){$cur=Join-Path $Root $name;if((Test-
 
 $log=$null
 try{
- if(-not(Test-Path $Root)){throw "Не найдена рабочая папка Domlight: $Root"}
- $data=Join-Path $Root 'data';if(-not(Test-Path $data)){throw "Не найдена data в $Root"}
+ if(-not(Test-Path $Root)){throw "Domlight folder not found: $Root"}
+ $data=Join-Path $Root 'data';if(-not(Test-Path $data)){throw "Domlight data folder not found: $data"}
  $stamp=Get-Date -Format 'yyyyMMdd_HHmmss';$log=Join-Path $data ('recovery_v141_'+$stamp+'.log');"START v141 recovery $((Get-Date).ToString('s'))"|Set-Content $log -Encoding UTF8
  $stage=Join-Path $data ('recovery_stage\'+$stamp);$safe=Join-Path $data ('recovery_safety\'+$stamp);New-Item -ItemType Directory -Force -Path $stage,$safe|Out-Null
  $pins=@(
@@ -39,10 +39,10 @@ try{
  )
  foreach($f in $pins){$name=$f[0];$ver=$f[1];$sha=$f[2];$dst=Join-Path $stage $name;$url="https://raw.githubusercontent.com/antjustdevelops/Domlight-Releases/main/files/$ver/$name";Invoke-WebRequest -UseBasicParsing -Uri $url -OutFile $dst -TimeoutSec 40;if((BlobSha $dst)-ne$sha){throw "SHA mismatch: $name"};if($name.EndsWith('.ps1')-and -not(ParseOk $dst)){throw "Parser error: $name"};"OK pin $name $ver"|Add-Content $log -Encoding UTF8}
 
- $oldMail=FindBackup 'Mailing.ps1' {param($p)(ParseOk $p)-and(MailScore $p)-ge3};if(-not$oldMail){throw 'Не найден полноценный pre-v135 Mailing.ps1 в data\update_backups'}
- $oldConn=FindBackup 'ConnectionSettings.ps1' {param($p)if(-not(ParseOk $p)){return $false};$t=Get-Content $p -Raw;($t-match'useProxy'-and$t-match'proxyUrl'-and$t-match'proxyUser'-and$t-match'proxyPassword')};if(-not$oldConn){throw 'Не найден pre-v135 ConnectionSettings.ps1 в data\update_backups'}
- $gmailSource=FindCurrentOrBackup 'GmailApi.ps1';if(-not$gmailSource){throw 'Не найден рабочий GmailApi.ps1 ни в установке, ни в update_backups'}
- $recipientsSource=FindCurrentOrBackup 'Recipients.ps1';if(-not$recipientsSource){throw 'Не найден рабочий Recipients.ps1 ни в установке, ни в update_backups'}
+ $oldMail=FindBackup 'Mailing.ps1' {param($p)(ParseOk $p)-and(MailScore $p)-ge3};if(-not$oldMail){throw 'Full pre-v135 Mailing.ps1 was not found in data\update_backups'}
+ $oldConn=FindBackup 'ConnectionSettings.ps1' {param($p)if(-not(ParseOk $p)){return $false};$t=Get-Content $p -Raw;($t-match'useProxy'-and$t-match'proxyUrl'-and$t-match'proxyUser'-and$t-match'proxyPassword')};if(-not$oldConn){throw 'Pre-v135 ConnectionSettings.ps1 was not found in data\update_backups'}
+ $gmailSource=FindCurrentOrBackup 'GmailApi.ps1';if(-not$gmailSource){throw 'GmailApi.ps1 was not found in current install or update_backups'}
+ $recipientsSource=FindCurrentOrBackup 'Recipients.ps1';if(-not$recipientsSource){throw 'Recipients.ps1 was not found in current install or update_backups'}
  "Legacy Mailing: $oldMail"|Add-Content $log -Encoding UTF8;"Legacy ConnectionSettings: $oldConn"|Add-Content $log -Encoding UTF8;"GmailApi source: $gmailSource"|Add-Content $log -Encoding UTF8;"Recipients source: $recipientsSource"|Add-Content $log -Encoding UTF8
 
  $managed=@($pins|ForEach-Object{$_[0]})+@('Mailing.ps1','ConnectionSettings.ps1','GmailApi.ps1','Recipients.ps1','UpdateFromGitHub.ps1','SelfCheck.ps1','VERSION.txt');$had=@{}
@@ -53,7 +53,7 @@ try{
   Copy-Item $oldConn (Join-Path $Root 'ConnectionSettings.ps1') -Force
   Copy-Item $gmailSource (Join-Path $Root 'GmailApi.ps1') -Force
   Copy-Item $recipientsSource (Join-Path $Root 'Recipients.ps1') -Force
-  $updateStub="Add-Type -AssemblyName System.Windows.Forms`r`n[Windows.Forms.MessageBox]::Show('Обновление временно отключено в v141 RECOVERY CANDIDATE до завершения регрессионного теста.','Domlight Recovery','OK','Information')|Out-Null`r`n";Set-Content (Join-Path $Root 'UpdateFromGitHub.ps1') -Value $updateStub -Encoding UTF8
+  $updateStub="Add-Type -AssemblyName System.Windows.Forms`r`n[Windows.Forms.MessageBox]::Show('Updates are temporarily disabled in v141 RECOVERY CANDIDATE until regression testing is complete.','Domlight Recovery','OK','Information')|Out-Null`r`n";Set-Content (Join-Path $Root 'UpdateFromGitHub.ps1') -Value $updateStub -Encoding UTF8
   Set-Content (Join-Path $Root 'VERSION.txt') -Value 'Domlight v141 RECOVERY CANDIDATE' -Encoding UTF8
   $self=@(
    '$ErrorActionPreference=''Stop''',
@@ -68,9 +68,9 @@ try{
   $out=& powershell.exe -NoProfile -ExecutionPolicy Bypass -File (Join-Path $Root 'SelfCheck.ps1') 2>&1;$out|Add-Content $log -Encoding UTF8;if($LASTEXITCODE-ne0){throw('SelfCheck failed: '+($out-join' '))}
  }catch{
   foreach($n in $managed){$dst=Join-Path $Root $n;$bak=Join-Path $safe $n;if($had[$n]){if(Test-Path $bak){Copy-Item $bak $dst -Force}}elseif(Test-Path $dst){Remove-Item $dst -Force}}
-  throw "Установка автоматически откачена: $($_.Exception.Message)"
+  throw "Install rolled back automatically: $($_.Exception.Message)"
  }
  Remove-Item $stage -Recurse -Force -ErrorAction SilentlyContinue;"SUCCESS"|Add-Content $log -Encoding UTF8
- Info("v141 RECOVERY CANDIDATE установлен.`r`nSelfCheck: OK`r`nSafety backup: $safe`r`nLog: $log")
+ Info("v141 RECOVERY CANDIDATE installed.`r`nSelfCheck: OK`r`nSafety backup: $safe`r`nLog: $log")
  exit 0
 }catch{if($log){"ERROR: $($_.Exception.Message)"|Add-Content $log -Encoding UTF8};Fail($_.Exception.Message);exit 1}
