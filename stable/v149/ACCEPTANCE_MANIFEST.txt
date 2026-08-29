@@ -1,0 +1,25 @@
+DOMLIGHT v149 STABLE ACCEPTANCE MANIFEST
+Accepted: 2026-08-29
+
+STATUS: USER-ACCEPTED RECOVERY BASELINE
+
+PROTECTED BEHAVIOR
+1. Existing pre-meter application behavior is preserved.
+2. Receipt mailing is protected from meter-feature changes.
+3. Account status UI uses five accepted actions.
+4. Account status UI is single-instance.
+5. Meter feature remains isolated.
+6. Meter New Value is editable.
+7. Empty/invalid New Value => Transfer checkbox cannot be selected.
+8. Clearing New Value => Transfer checkbox is cleared automatically.
+
+SETUP SHA-256
+37d08dca87f1049bac2e57978c04fa1d2d74ca5c0bd585f3e812566183392b92
+
+DEVELOPMENT POLICY
+- Never develop directly on this stable anchor.
+- Never overwrite this stable anchor with DEV/TEST work.
+- New features must declare the exact files they are allowed to modify.
+- Unrelated working modules are protected.
+- User data directory is immutable during program upgrades except explicit data migrations with backup and rollback.
+- Full regression is required before a newer version can become STABLE.
