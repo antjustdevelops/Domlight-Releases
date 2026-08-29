@@ -1,0 +1,19 @@
+{
+  "schema": 1,
+  "policy": "A user-accepted capability is protected. New work must not change its accepted behavior unless that capability is the explicit change target and the full regression suite passes again.",
+  "stable_reference": {
+    "legacy_core": "v106 RELEASE",
+    "note": "v140 is not a stable baseline because receipt mailing regressed while meter work advanced. Recovery must compose accepted implementations rather than treating v140 wholesale as stable."
+  },
+  "modules": [
+    {"id":"dashboard","status":"protected","accepted_reference":"v106","contract":"Main dashboard opens and launches accepted modules without changing their behavior."},
+    {"id":"interactive_receipt_sync","status":"protected","accepted_reference":"v106","contract":"Login/session and manual receipt synchronization continue to work with existing archive identity logic."},
+    {"id":"background_receipt_check","status":"protected","accepted_reference":"v106","contract":"Background receipt checking completes independently and reports a fresh result without damaging archive or state."},
+    {"id":"receipt_archive","status":"protected","accepted_reference":"v106","contract":"Downloaded PDFs are normalized/sorted without deleting unrelated receipts or local history."},
+    {"id":"account_lifecycle","status":"protected","accepted_reference":"v106 plus later accepted AccountStatus fixes","contract":"1-2 successful misses => missing; 3 => inactive; return => active; explicit exclusion/restoration persists."},
+    {"id":"connection_proxy","status":"protected","accepted_reference":"v106","contract":"Existing connection/proxy settings remain compatible with accepted portal operations."},
+    {"id":"receipt_mailing","status":"RECOVERY_REQUIRED","accepted_reference":"working local behavior from v96-v106","contract":"The exact user-accepted receipt preparation/mailing behavior must be recovered before a new stable baseline. A rewritten replacement is not acceptance-equivalent."},
+    {"id":"updater","status":"protected_after_acceptance","accepted_reference":"post-v106 line","contract":"Application updates never replace data/ and must preserve rollback/integrity behavior."},
+    {"id":"meters","status":"candidate_not_baseline","accepted_reference":"v140 partial","contract":"Current meter reading/draft UI may be salvaged, but it cannot define the application baseline until all older protected modules pass regression."}
+  ]
+}
