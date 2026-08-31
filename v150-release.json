@@ -1,0 +1,14 @@
+{
+  "version": "v150 STABLE",
+  "tag": "v150-stable",
+  "published": "2026-08-31",
+  "installer": {
+    "name": "Domlight_Setup_v150_STABLE_CANONICAL.zip",
+    "url": "https://github.com/antjustdevelops/Domlight-Releases/releases/download/v150-stable/Domlight_Setup_v150_STABLE_CANONICAL.zip",
+    "sha256": "c0f7d03f691d815188e2894380334e513ea9d2db195d5cebe6f33abb83f5ffb2",
+    "size": 9082898
+  },
+  "source_capture_sha256": "ec41db4da5feef6a323e30cc8ad9f2074b68ac291187c28b987a2f4cd27cebc5",
+  "status": "CANONICAL_ACCEPTED",
+  "notes": "Exact accepted v150 runtime capture. data excluded/preserved. Meter submission remains disabled. Legacy v149 packages are withdrawn. Existing legacy file-by-file updater remains pinned to v111 until a separately tested package updater is promoted."
+}
