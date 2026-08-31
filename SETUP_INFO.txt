@@ -1,16 +1,22 @@
-DOMLIGHT PERMANENT SETUP
+DOMLIGHT CANONICAL SETUP
 
-Permanent installer filename: Domlight_Setup.zip
-Baseline inside setup: v96 RELEASE
-SHA-256 (full setup package): 98dfa65b94400034562e2df3fbad47947c101cdbb181092ca92b5c2631905d6c
+Current accepted stable release: Domlight v150 STABLE
+Release tag: v150-stable
+Installer filename: Domlight_Setup_v150_STABLE_CANONICAL.zip
+Download: https://github.com/antjustdevelops/Domlight-Releases/releases/download/v150-stable/Domlight_Setup_v150_STABLE_CANONICAL.zip
+SHA-256: c0f7d03f691d815188e2894380334e513ea9d2db195d5cebe6f33abb83f5ffb2
+Source-of-truth runtime capture SHA-256: ec41db4da5feef6a323e30cc8ad9f2074b68ac291187c28b987a2f4cd27cebc5
 
-Install on a new Windows PC:
-1. Download Domlight_Setup.zip.
+Install on a Windows PC:
+1. Download Domlight_Setup_v150_STABLE_CANONICAL.zip from the v150-stable GitHub Release.
 2. Extract the ZIP completely.
-3. Run INSTALL_DOMLIGHT_FINAL.bat.
-4. Use the Domlight desktop shortcut.
-5. Sign in to the resident portal again on the new PC.
-6. Authorize Gmail again when first needed.
-7. Future updates are installed from inside Domlight with the Update button via GitHub.
+3. Run INSTALL_DOMLIGHT_v150_STABLE.cmd.
+4. Existing Documents\Domlight\data is preserved; never delete it manually.
+5. On a new PC, portal/Gmail authorization may be required again.
 
-IMPORTANT: never delete Documents\Domlight\data on an existing installation.
+IMPORTANT RELEASE POLICY:
+- v150 STABLE is the canonical accepted setup release.
+- v149 packages/installers are WITHDRAWN and must not be installed.
+- The old root Domlight_Setup.zip is a legacy v96 artifact and is NOT the current installer.
+- latest.json remains intentionally pinned to v111 because the existing in-app updater is file-by-file. It must not be pointed at v150 until a separately tested package-updater mechanism is accepted.
+- Meter submission remains disabled in v150 STABLE.
