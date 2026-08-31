@@ -1,9 +1,9 @@
 {
-  "version": "v150 STABLE",
-  "package_url": "https://github.com/antjustdevelops/Domlight-Releases/releases/download/v150-stable/Domlight_Setup_v150_STABLE_CANONICAL.zip",
-  "package_sha256": "c0f7d03f691d815188e2894380334e513ea9d2db195d5cebe6f33abb83f5ffb2",
-  "payload_sha256": "4c7c5c43c52b5f909b40826ff3c5c15ce7a883a82c233ff655ac7a1860615df4",
-  "channel": "package",
-  "status": "DORMANT_BASELINE",
-  "notes": "Package channel exists for v151 updater development. It is intentionally pinned to v150, so accepted v150 installations see no update. Do not advance this manifest until a complete v151 test package has passed all promotion gates."
+  "version": "v151 TEST - package updater",
+  "package_url": "https://github.com/antjustdevelops/Domlight-Releases/releases/download/v151-package-test/Domlight_v151_TEST_PACKAGE.zip",
+  "package_sha256": "e223a4564e5fccbd1ecef98c7bbb5852c6fd70843b2b0d7b35264f3f3c4b7699",
+  "payload_sha256": "a6db08f6c4524ba1c4959f4e0f36e7616170659ebd5739cd026463a3bc16758e",
+  "channel": "package-dev",
+  "status": "DEV_TEST_ONLY",
+  "notes": "Pre-release package updater validation build. Based on canonical v150; only visible version labels changed. Do not use as production latest."
 }
