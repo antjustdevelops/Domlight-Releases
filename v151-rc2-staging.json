@@ -1,0 +1,11 @@
+{
+  "version": "v151 RELEASE CANDIDATE",
+  "tag": "v151-rc2",
+  "asset": "Domlight_v151_RELEASE_CANDIDATE_2.zip",
+  "package_url": "https://github.com/antjustdevelops/Domlight-Releases/releases/download/v151-rc2/Domlight_v151_RELEASE_CANDIDATE_2.zip",
+  "package_sha256": "68a656bff36de3821cbf800324d595e5463a397be12efb65b62195b35b47b242",
+  "payload_sha256": "e7260282325833952476a0e545aa025bb5098744aa264e36cadec611a24abd1e",
+  "channel": "staging-only",
+  "status": "WAITING_FOR_RELEASE_ASSET",
+  "notes": "Do not point package-latest.json here until the GitHub release asset exists and its digest is verified. Production latest.json remains untouched."
+}
