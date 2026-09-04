@@ -1,9 +1,9 @@
 {
-  "version": "v150 STABLE",
-  "package_url": "https://github.com/antjustdevelops/Domlight-Releases/releases/download/v150-stable/Domlight_Setup_v150_STABLE_CANONICAL.zip",
-  "package_sha256": "c0f7d03f691d815188e2894380334e513ea9d2db195d5cebe6f33abb83f5ffb2",
-  "payload_sha256": "4c7c5c43c52b5f909b40826ff3c5c15ce7a883a82c233ff655ac7a1860615df4",
-  "channel": "package",
-  "status": "DORMANT_BASELINE",
-  "notes": "RC2 end-to-end UI attempt did not work. Test channel disabled immediately. Production legacy latest.json remains unchanged. Diagnose local installed updater/button state before any further channel activation."
+  "version": "v152 RC TEST",
+  "package_url": "https://github.com/antjustdevelops/Domlight-Releases/releases/download/v151-rc2/Domlight_v151_RELEASE_CANDIDATE_2.zip",
+  "package_sha256": "68a656bff36de3821cbf800324d595e5463a397be12efb65b62195b35b47b242",
+  "payload_sha256": "e7260282325833952476a0e545aa025bb5098744aa264e36cadec611a24abd1e",
+  "channel": "package-test",
+  "status": "RC2_END_TO_END_TEST",
+  "notes": "Temporary v152 test marker intentionally makes installed v151 TEST detect RC2 as newer. Read-only diagnostics confirmed the active installation path, shortcut target, channel access and updater parse are valid. Production legacy latest.json remains unchanged."
 }
