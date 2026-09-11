@@ -1,9 +1,9 @@
 {
-  "version": "v152 RC TEST",
-  "package_url": "https://github.com/antjustdevelops/Domlight-Releases/releases/download/v151-rc2/Domlight_v151_RELEASE_CANDIDATE_2.zip",
-  "package_sha256": "68a656bff36de3821cbf800324d595e5463a397be12efb65b62195b35b47b242",
-  "payload_sha256": "e7260282325833952476a0e545aa025bb5098744aa264e36cadec611a24abd1e",
-  "channel": "package-test",
-  "status": "RC2_END_TO_END_TEST",
-  "notes": "Temporary v152 test marker intentionally makes installed v151 TEST detect RC2 as newer. Read-only diagnostics confirmed the active installation path, shortcut target, channel access and updater parse are valid. Production legacy latest.json remains unchanged."
+  "version": "v151 STABLE",
+  "package_url": "https://github.com/antjustdevelops/Domlight-Releases/releases/download/v151-stable/Domlight_v151_STABLE_INSTALLER_FIXED.zip",
+  "package_sha256": "19e8c37b28d421b7030fd6d7eab48e08ff35856aded75e1e1e42217713261d40",
+  "payload_sha256": "2e7dea123e8ae21f02073a47cf835d243920838fc8dcd94265a9e01963d762c3",
+  "channel": "stable",
+  "status": "ACCEPTED_STABLE",
+  "notes": "Accepted v151 STABLE, promoted from user-tested RC7. Package updater, single-instance launch, account status, meters, mailing, receipts folder, report/history, proxy/gateway and receipt check were acceptance-tested. Installer preserves runtime data. Legacy latest.json remains unchanged because it uses the older file-by-file schema."
 }
